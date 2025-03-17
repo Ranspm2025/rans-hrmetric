@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Plus, FileText, Clock, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { policies } from '@/lib/data';
 import { Input } from '@/components/ui/input';
@@ -252,9 +253,11 @@ const Policies = () => {
                     </p>
                   </CardContent>
                   <CardFooter className="border-t pt-4">
-                    <Button variant="outline" size="sm" className="w-full gap-1">
-                      <FileText className="h-3.5 w-3.5" />
-                      Baca Selengkapnya
+                    <Button variant="outline" size="sm" className="w-full gap-1" asChild>
+                      <Link to={`/policy/${policy.id}`}>
+                        <FileText className="h-3.5 w-3.5" />
+                        Baca Selengkapnya
+                      </Link>
                     </Button>
                   </CardFooter>
                 </Card>
