@@ -127,6 +127,121 @@ export const employees: Employee[] = [
   },
 ];
 
+export const evaluationCriteria: EvaluationCriteria[] = [
+  {
+    id: '1',
+    name: 'Kedisiplinan',
+    category: 'performance',
+    weight: 20,
+    description: 'Ketepatan waktu dan kepatuhan pada aturan',
+  },
+  {
+    id: '2',
+    name: 'Kualitas Kerja',
+    category: 'performance',
+    weight: 30,
+    description: 'Ketelitian dan hasil pekerjaan',
+  },
+  {
+    id: '3',
+    name: 'Kerjasama Tim',
+    category: 'personality',
+    weight: 25,
+    description: 'Kemampuan bekerja dengan rekan',
+  },
+  {
+    id: '4',
+    name: 'Inisiatif',
+    category: 'personality',
+    weight: 25,
+    description: 'Kemampuan mengambil inisiatif dan solusi',
+  },
+];
+
+export const users: User[] = [
+  {
+    id: '1',
+    name: 'Admin',
+    email: 'admin@example.com',
+    role: 'admin',
+    avatar: 'https://i.pravatar.cc/150?img=67',
+  },
+  {
+    id: '2',
+    name: 'Manager',
+    email: 'manager@example.com',
+    role: 'manager',
+    avatar: 'https://i.pravatar.cc/150?img=68',
+  },
+  {
+    id: '3',
+    name: 'Karyawan',
+    email: 'karyawan@example.com',
+    role: 'karyawan',
+    avatar: 'https://i.pravatar.cc/150?img=47',
+  },
+  {
+    id: '4',
+    name: 'Pemimpin',
+    email: 'pemimpin@example.com',
+    role: 'pemimpin',
+    avatar: 'https://i.pravatar.cc/150?img=60',
+  },
+];
+
+export const documents: Document[] = [
+  {
+    id: '1',
+    title: 'Laporan Kinerja Q1 2023',
+    employeeId: '2',
+    uploadedAt: '2023-04-15',
+    fileUrl: '/documents/report1.pdf',
+    status: 'approved',
+    comments: 'Laporan lengkap dan terperinci',
+  },
+  {
+    id: '2',
+    title: 'Evaluasi Proyek Marketing',
+    employeeId: '1',
+    uploadedAt: '2023-06-22',
+    fileUrl: '/documents/eval1.pdf',
+    status: 'pending',
+  },
+];
+
+export const evaluations: Evaluation[] = [
+  {
+    id: '1',
+    employeeId: '2',
+    managerId: '2',
+    date: '2023-12-15',
+    criteriaScores: [
+      { criteriaId: '1', score: 85 },
+      { criteriaId: '2', score: 90 },
+      { criteriaId: '3', score: 88 },
+      { criteriaId: '4', score: 92 },
+    ],
+    overallComment: 'Kinerja sangat baik, perlu peningkatan kedisiplinan',
+    approved: false,
+  },
+  {
+    id: '2',
+    employeeId: '1',
+    managerId: '2',
+    date: '2023-11-20',
+    criteriaScores: [
+      { criteriaId: '1', score: 95 },
+      { criteriaId: '2', score: 88 },
+      { criteriaId: '3', score: 90 },
+      { criteriaId: '4', score: 85 },
+    ],
+    overallComment: 'Kemampuan kepemimpinan yang baik',
+    approved: true,
+    approvedById: '4',
+    approvedDate: '2023-11-25',
+  },
+];
+
 export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
 };
