@@ -1,42 +1,58 @@
-
-import { motion } from 'framer-motion';
-import { Award, ChevronRight, Medal, TrendingUp, User, Calendar } from 'lucide-react';
-import { getPromotionCandidates, getPromotionScore, employees } from '@/lib/data';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
+import { motion } from "framer-motion";
+import {
+  Award,
+  ChevronRight,
+  Medal,
+  TrendingUp,
+  User,
+  Calendar,
+} from "lucide-react";
+import { getPromotionCandidates, getPromotionScore, employees } from "@/lib/data";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
   CardTitle,
-  CardFooter
-} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+  CardFooter,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PromotionCandidates = () => {
   const monthCandidates = getPromotionCandidates();
-  
-  // For yearly, we'll do a more complex sort (for a real app, this would come from the backend)
+
+  // Sorting berdasarkan skor (65% performance, 35% personality)
   const yearCandidates = [...employees]
     .sort((a, b) => {
-      const scoreA = a.performance * 0.65 + a.personality * 0.35;
-      const scoreB = b.performance * 0.65 + b.personality * 0.35;
+      const scoreA = (a.performance ?? 0) * 0.65 + (a.personality ?? 0) * 0.35;
+      const scoreB = (b.performance ?? 0) * 0.65 + (b.personality ?? 0) * 0.35;
       return scoreB - scoreA;
     })
     .slice(0, 3);
-  
+
   const getPositionIcon = (index: number) => {
     switch (index) {
-      case 0: return <Medal className="h-5 w-5 text-yellow-500" />;
-      case 1: return <Medal className="h-5 w-5 text-gray-400" />;
-      case 2: return <Medal className="h-5 w-5 text-amber-600" />;
-      default: return <Award className="h-5 w-5 text-primary" />;
+      case 0:
+        return <Medal className="h-5 w-5 text-yellow-500" />;
+      case 1:
+        return <Medal className="h-5 w-5 text-gray-400" />;
+      case 2:
+        return <Medal className="h-5 w-5 text-amber-600" />;
+      default:
+        return <Award className="h-5 w-5 text-primary" />;
     }
   };
 
-  const CandidateList = ({ candidates, type }: { candidates: typeof employees, type: string }) => (
+  const CandidateList = ({
+    candidates,
+    type,
+  }: {
+    candidates: typeof employees;
+    type: string;
+  }) => (
     <div className="space-y-3">
       {candidates.map((candidate, index) => (
         <motion.div
@@ -49,10 +65,13 @@ const PromotionCandidates = () => {
           <div className="flex items-center gap-3">
             <div className="relative">
               <Avatar className="h-10 w-10 border-2 border-primary/20">
-                <AvatarImage src={candidate.avatar} alt={candidate.name} />
-                <AvatarFallback>
-                  <User className="h-5 w-5" />
-                </AvatarFallback>
+                {candidate.avatar ? (
+                  <AvatarImage src={candidate.avatar} alt={candidate.name} />
+                ) : (
+                  <AvatarFallback>
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                )}
               </Avatar>
               <div className="absolute -top-1 -right-1 bg-background rounded-full p-0.5">
                 {getPositionIcon(index)}
@@ -60,16 +79,21 @@ const PromotionCandidates = () => {
             </div>
             <div>
               <p className="font-medium text-sm">{candidate.name}</p>
-              <p className="text-xs text-muted-foreground">{candidate.position}</p>
+              <p className="text-xs text-muted-foreground">
+                {candidate.position}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
               <p className="text-xs text-muted-foreground">Skor</p>
               <p className="font-semibold">
-                {type === 'month' 
-                  ? getPromotionScore(candidate).toFixed(1)
-                  : (candidate.performance * 0.65 + candidate.personality * 0.35).toFixed(1)}
+                {type === "month"
+                  ? (getPromotionScore(candidate) ?? 0).toFixed(1)
+                  : (
+                      (candidate.performance ?? 0) * 0.65 +
+                      (candidate.personality ?? 0) * 0.35
+                    ).toFixed(1)}
               </p>
             </div>
             <Button variant="ghost" size="icon" asChild>
