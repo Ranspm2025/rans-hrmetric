@@ -144,9 +144,6 @@ export const getEmployeeById = (id: string): Employee | undefined => {
 export const getPolicyById = (id: string): Policy | undefined => {
   return policies.find(policy => policy.id === id);
 };
-export const getPolicyById = (id: string): Policy | undefined => {
-  return policies.find(policy => policy.id === id);
-};
 
 export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
   const newCriteria: EvaluationCriteria = {
@@ -184,90 +181,15 @@ export const setCurrentUser = (user: User | null): void => {
 };
 
 export const getEvaluationsByEmployeeId = (employeeId: string): Evaluation[] => {
-  return evaluations.filter(eval => eval.employeeId === employeeId);
+  return evaluations.filter(evaluation => evaluation.employeeId === employeeId);
 };
 
 export const getEvaluationsPendingApproval = (): Evaluation[] => {
-  return evaluations.filter(eval => !eval.approved);
+  return evaluations.filter(evaluation => !evaluation.approved);
 };
 
 export const approveEvaluation = (evaluationId: string, approverId: string): void => {
-  const evaluation = evaluations.find(eval => eval.id === evaluationId);
-  if (evaluation) {
-    evaluation.approved = true;
-    evaluation.approvedById = approverId;
-    evaluation.approvedDate = new Date().toISOString().split('T')[0];
-  }
-};
-
-export const addDocument = (doc: Omit<Document, 'id' | 'status' | 'uploadedAt'>): Document => {
-  const newDoc: Document = {
-    ...doc,
-    id: (documents.length + 1).toString(),
-    status: 'pending',
-    uploadedAt: new Date().toISOString().split('T')[0],
-  };
-  documents.push(newDoc);
-  return newDoc;
-};
-
-export const updateDocument = (id: string, updates: Partial<Document>): Document | undefined => {
-  const docIndex = documents.findIndex(doc => doc.id === id);
-  if (docIndex >= 0) {
-    documents[docIndex] = { ...documents[docIndex], ...updates };
-    return documents[docIndex];
-  }
-  return undefined;
-};
-export const getPolicyById = (id: string): Policy | undefined => {
-  return policies.find(policy => policy.id === id);
-};
-
-export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
-  const newCriteria: EvaluationCriteria = {
-    ...criteria,
-    id: (evaluationCriteria.length + 1).toString(),
-  };
-  evaluationCriteria.push(newCriteria);
-  return newCriteria;
-};
-
-export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
-  const newEmployee: Employee = {
-    ...employee,
-    id: (employees.length + 1).toString(),
-  };
-  employees.push(newEmployee);
-  return newEmployee;
-};
-
-export const getUserByEmailAndPassword = (email: string, password: string): User | undefined => {
-  return users.find(user => user.email === email);
-};
-
-export const getCurrentUser = (): User | null => {
-  const storedUser = localStorage.getItem('currentUser');
-  return storedUser ? JSON.parse(storedUser) : null;
-};
-
-export const setCurrentUser = (user: User | null): void => {
-  if (user) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-  } else {
-    localStorage.removeItem('currentUser');
-  }
-};
-
-export const getEvaluationsByEmployeeId = (employeeId: string): Evaluation[] => {
-  return evaluations.filter(eval => eval.employeeId === employeeId);
-};
-
-export const getEvaluationsPendingApproval = (): Evaluation[] => {
-  return evaluations.filter(eval => !eval.approved);
-};
-
-export const approveEvaluation = (evaluationId: string, approverId: string): void => {
-  const evaluation = evaluations.find(eval => eval.id === evaluationId);
+  const evaluation = evaluations.find(evaluation => evaluation.id === evaluationId);
   if (evaluation) {
     evaluation.approved = true;
     evaluation.approvedById = approverId;
