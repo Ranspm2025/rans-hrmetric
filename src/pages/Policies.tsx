@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Plus } from 'lucide-react';
@@ -22,9 +21,12 @@ const Policies = () => {
     title: '',
     category: '',
     description: '',
+    customCategory: ''
   });
   const { toast } = useToast();
   const { isAdmin, isManager } = useAuth();
+
+  const categories = [...new Set(policies.map(policy => policy.category))];
 
   const filteredPolicies = policies.filter(policy => {
     const matchesSearch = policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,9 +35,7 @@ const Policies = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const categories = [...new Set(policies.map(policy => policy.category))];
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e) => {
     const { id, value } = e.target;
     setNewPolicy(prev => ({
       ...prev,
@@ -43,28 +43,26 @@ const Policies = () => {
     }));
   };
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value) => {
     setNewPolicy(prev => ({
       ...prev,
-      category: value
+      category: value,
+      customCategory: value === 'Kategori Baru' ? '' : prev.customCategory
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // In a real app, this would add to the database
+    const finalCategory = newPolicy.category === 'Kategori Baru' ? newPolicy.customCategory : newPolicy.category;
+    if (!finalCategory) return;
+
     toast({
       title: "Kebijakan Berhasil Ditambahkan",
       description: `${newPolicy.title} telah ditambahkan ke daftar kebijakan`,
     });
     
     setIsDialogOpen(false);
-    setNewPolicy({
-      title: '',
-      category: '',
-      description: '',
-    });
+    setNewPolicy({ title: '', category: '', description: '', customCategory: '' });
   };
 
   return (
@@ -72,25 +70,16 @@ const Policies = () => {
       <Navbar />
       
       <div className="container mx-auto px-4 pt-32 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-wrap items-center justify-between gap-4 mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">Kebijakan Perusahaan</h1>
-            <p className="text-muted-foreground">
-              Panduan dan regulasi untuk seluruh karyawan
-            </p>
+            <p className="text-muted-foreground">Panduan dan regulasi untuk seluruh karyawan</p>
           </div>
-          
           {(isAdmin || isManager) && (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Plus className="h-4 w-4 mr-1" />
-                  Tambah Kebijakan
+                  <Plus className="h-4 w-4 mr-1" /> Tambah Kebijakan
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -101,15 +90,8 @@ const Policies = () => {
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="title">Judul Kebijakan</Label>
-                      <Input
-                        id="title"
-                        value={newPolicy.title}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan judul kebijakan"
-                        required
-                      />
+                      <Input id="title" value={newPolicy.title} onChange={handleInputChange} placeholder="Masukkan judul kebijakan" required />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="category">Kategori</Label>
                       <Select value={newPolicy.category} onValueChange={handleSelectChange}>
@@ -117,44 +99,26 @@ const Policies = () => {
                           <SelectValue placeholder="Pilih kategori" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
+                          {categories.map(category => (
+                            <SelectItem key={category} value={category}>{category}</SelectItem>
                           ))}
                           <SelectItem value="Kategori Baru">Kategori Baru</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    
                     {newPolicy.category === 'Kategori Baru' && (
                       <div className="space-y-2">
                         <Label htmlFor="customCategory">Nama Kategori Baru</Label>
-                        <Input
-                          id="customCategory"
-                          onChange={(e) => setNewPolicy(prev => ({ ...prev, category: e.target.value }))}
-                          placeholder="Masukkan nama kategori baru"
-                          required
-                        />
+                        <Input id="customCategory" value={newPolicy.customCategory} onChange={handleInputChange} placeholder="Masukkan nama kategori baru" required />
                       </div>
                     )}
-                    
                     <div className="space-y-2">
                       <Label htmlFor="description">Deskripsi</Label>
-                      <Textarea
-                        id="description"
-                        value={newPolicy.description}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan deskripsi kebijakan"
-                        className="min-h-32"
-                        required
-                      />
+                      <Textarea id="description" value={newPolicy.description} onChange={handleInputChange} placeholder="Masukkan deskripsi kebijakan" className="min-h-32" required />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Batal
-                    </Button>
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Batal</Button>
                     <Button type="submit">Tambah Kebijakan</Button>
                   </DialogFooter>
                 </form>
@@ -162,47 +126,28 @@ const Policies = () => {
             </Dialog>
           )}
         </motion.div>
-        
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari kebijakan..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="Filter Kategori" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Semua Kategori</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="mb-8 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Cari kebijakan..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
           </div>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px]">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <SelectValue placeholder="Filter Kategori" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Semua Kategori</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>{category}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPolicies.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground">Tidak ada kebijakan yang ditemukan.</p>
-            </div>
-          ) : (
-            filteredPolicies.map((policy, index) => (
-              <PolicyCard key={policy.id} policy={policy} index={index} />
-            ))
-          )}
+          {filteredPolicies.length === 0 ? <p className="text-center text-muted-foreground">Tidak ada kebijakan yang ditemukan.</p> : filteredPolicies.map((policy, index) => <PolicyCard key={policy.id} policy={policy} index={index} />)}
         </div>
       </div>
     </div>
