@@ -23,6 +23,8 @@ const ManageEmployees = () => {
     department: '',
     avatar: 'https://i.pravatar.cc/150',
     hireDate: new Date().toISOString().split('T')[0],
+    performance: 0,
+    personality: 0,
   });
   const { isAuthenticated, isAdmin, isManager } = useAuth();
   const { toast } = useToast();
@@ -67,6 +69,8 @@ const ManageEmployees = () => {
       department: '',
       avatar: 'https://i.pravatar.cc/150',
       hireDate: new Date().toISOString().split('T')[0],
+      performance: 0,
+      personality: 0,
     });
   };
 

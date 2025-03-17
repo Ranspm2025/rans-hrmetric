@@ -306,8 +306,6 @@ export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
   const newEmployee: Employee = {
     ...employee,
     id: (employees.length + 1).toString(),
-    performance: 0,
-    personality: 0,
   };
   employees.push(newEmployee);
   return newEmployee;
