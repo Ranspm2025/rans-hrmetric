@@ -1,4 +1,3 @@
-
 export interface Policy {
   id: string;
   title: string;
@@ -126,201 +125,6 @@ export const employees: Employee[] = [
     performance: 88,
     personality: 90,
   },
-  {
-    id: '3',
-    name: 'Ahmad Wijaya',
-    position: 'Pengembang Software',
-    department: 'Teknologi',
-    avatar: 'https://i.pravatar.cc/150?img=3',
-    hireDate: '2019-11-22',
-    performance: 95,
-    personality: 82,
-  },
-  {
-    id: '4',
-    name: 'Dewi Lestari',
-    position: 'Spesialis HR',
-    department: 'SDM',
-    avatar: 'https://i.pravatar.cc/150?img=10',
-    hireDate: '2022-01-05',
-    performance: 85,
-    personality: 93,
-  },
-  {
-    id: '5',
-    name: 'Agus Purnomo',
-    position: 'Koordinator Operasional',
-    department: 'Operasional',
-    avatar: 'https://i.pravatar.cc/150?img=6',
-    hireDate: '2020-09-18',
-    performance: 90,
-    personality: 85,
-  },
-  {
-    id: '6',
-    name: 'Maya Indah',
-    position: 'Desainer Grafis',
-    department: 'Kreatif',
-    avatar: 'https://i.pravatar.cc/150?img=9',
-    hireDate: '2021-07-30',
-    performance: 87,
-    personality: 89,
-  },
-];
-
-export const evaluationCriteria: EvaluationCriteria[] = [
-  {
-    id: '1',
-    name: 'Ketercapaian Target',
-    category: 'performance',
-    weight: 30,
-    description: 'Sejauh mana karyawan mencapai target yang ditetapkan.'
-  },
-  {
-    id: '2',
-    name: 'Kualitas Kerja',
-    category: 'performance',
-    weight: 25,
-    description: 'Kualitas output pekerjaan yang dihasilkan.'
-  },
-  {
-    id: '3',
-    name: 'Kehadiran & Ketepatan Waktu',
-    category: 'performance',
-    weight: 15,
-    description: 'Tingkat kehadiran dan ketepatan waktu dalam bekerja.'
-  },
-  {
-    id: '4',
-    name: 'Kerja Sama Tim',
-    category: 'personality',
-    weight: 15,
-    description: 'Kemampuan bekerja sama dan berkontribusi dalam tim.'
-  },
-  {
-    id: '5',
-    name: 'Inisiatif',
-    category: 'personality',
-    weight: 10,
-    description: 'Kemampuan mengambil inisiatif dan menyelesaikan masalah.'
-  },
-  {
-    id: '6',
-    name: 'Adaptabilitas',
-    category: 'personality',
-    weight: 10,
-    description: 'Kemampuan beradaptasi dengan perubahan dan situasi baru.'
-  },
-  {
-    id: '7',
-    name: 'Kepemimpinan',
-    category: 'personality',
-    weight: 15,
-    description: 'Kemampuan memimpin dan menginspirasi orang lain.'
-  },
-  {
-    id: '8',
-    name: 'Komunikasi',
-    category: 'personality',
-    weight: 15,
-    description: 'Efektivitas dalam berkomunikasi lisan dan tertulis.'
-  },
-  {
-    id: '9',
-    name: 'Inovasi',
-    category: 'performance',
-    weight: 20,
-    description: 'Kemampuan menghasilkan ide dan solusi inovatif.'
-  },
-  {
-    id: '10',
-    name: 'Profesionalisme',
-    category: 'personality',
-    weight: 15,
-    description: 'Sikap profesional dan etika kerja.'
-  },
-];
-
-export const users: User[] = [
-  {
-    id: '1',
-    name: 'Admin Utama',
-    email: 'admin@empscaler.com',
-    role: 'admin',
-    avatar: 'https://i.pravatar.cc/150?img=11',
-  },
-  {
-    id: '2',
-    name: 'Budi Santoso',
-    email: 'budi@empscaler.com',
-    role: 'manager',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-  },
-  {
-    id: '3',
-    name: 'Siti Rahayu',
-    email: 'siti@empscaler.com',
-    role: 'karyawan',
-    avatar: 'https://i.pravatar.cc/150?img=5',
-  },
-  {
-    id: '4',
-    name: 'Direktur Utama',
-    email: 'direktur@empscaler.com',
-    role: 'pemimpin',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-  },
-];
-
-export const documents: Document[] = [
-  {
-    id: '1',
-    title: 'Evaluasi Kinerja Q1 2024',
-    employeeId: '3',
-    uploadedAt: '2024-03-15',
-    fileUrl: '/placeholder.svg',
-    status: 'reviewed',
-    comments: 'Dokumen sudah direview, perlu revisi minor',
-  },
-  {
-    id: '2',
-    title: 'Laporan Pencapaian Target',
-    employeeId: '6',
-    uploadedAt: '2024-03-10',
-    fileUrl: '/placeholder.svg',
-    status: 'approved',
-  },
-];
-
-export const evaluations: Evaluation[] = [
-  {
-    id: '1',
-    employeeId: '3',
-    managerId: '2',
-    date: '2024-03-15',
-    criteriaScores: [
-      { criteriaId: '1', score: 90 },
-      { criteriaId: '2', score: 85 },
-      { criteriaId: '4', score: 92 },
-    ],
-    overallComment: 'Kinerja yang sangat baik dalam project terakhir',
-    approved: false,
-  },
-  {
-    id: '2',
-    employeeId: '6',
-    managerId: '2',
-    date: '2024-03-10',
-    criteriaScores: [
-      { criteriaId: '1', score: 88 },
-      { criteriaId: '2', score: 82 },
-      { criteriaId: '4', score: 90 },
-    ],
-    overallComment: 'Konsisten dalam mencapai target',
-    approved: true,
-    approvedById: '4',
-    approvedDate: '2024-03-12',
-  },
 ];
 
 export const getPromotionScore = (employee: Employee): number => {
@@ -337,6 +141,84 @@ export const getEmployeeById = (id: string): Employee | undefined => {
   return employees.find(employee => employee.id === id);
 };
 
+export const getPolicyById = (id: string): Policy | undefined => {
+  return policies.find(policy => policy.id === id);
+};
+export const getPolicyById = (id: string): Policy | undefined => {
+  return policies.find(policy => policy.id === id);
+};
+
+export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
+  const newCriteria: EvaluationCriteria = {
+    ...criteria,
+    id: (evaluationCriteria.length + 1).toString(),
+  };
+  evaluationCriteria.push(newCriteria);
+  return newCriteria;
+};
+
+export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
+  const newEmployee: Employee = {
+    ...employee,
+    id: (employees.length + 1).toString(),
+  };
+  employees.push(newEmployee);
+  return newEmployee;
+};
+
+export const getUserByEmailAndPassword = (email: string, password: string): User | undefined => {
+  return users.find(user => user.email === email);
+};
+
+export const getCurrentUser = (): User | null => {
+  const storedUser = localStorage.getItem('currentUser');
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('currentUser');
+  }
+};
+
+export const getEvaluationsByEmployeeId = (employeeId: string): Evaluation[] => {
+  return evaluations.filter(eval => eval.employeeId === employeeId);
+};
+
+export const getEvaluationsPendingApproval = (): Evaluation[] => {
+  return evaluations.filter(eval => !eval.approved);
+};
+
+export const approveEvaluation = (evaluationId: string, approverId: string): void => {
+  const evaluation = evaluations.find(eval => eval.id === evaluationId);
+  if (evaluation) {
+    evaluation.approved = true;
+    evaluation.approvedById = approverId;
+    evaluation.approvedDate = new Date().toISOString().split('T')[0];
+  }
+};
+
+export const addDocument = (doc: Omit<Document, 'id' | 'status' | 'uploadedAt'>): Document => {
+  const newDoc: Document = {
+    ...doc,
+    id: (documents.length + 1).toString(),
+    status: 'pending',
+    uploadedAt: new Date().toISOString().split('T')[0],
+  };
+  documents.push(newDoc);
+  return newDoc;
+};
+
+export const updateDocument = (id: string, updates: Partial<Document>): Document | undefined => {
+  const docIndex = documents.findIndex(doc => doc.id === id);
+  if (docIndex >= 0) {
+    documents[docIndex] = { ...documents[docIndex], ...updates };
+    return documents[docIndex];
+  }
+  return undefined;
+};
 export const getPolicyById = (id: string): Policy | undefined => {
   return policies.find(policy => policy.id === id);
 };
