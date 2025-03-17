@@ -25,7 +25,7 @@ import {
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newPolicy, setNewPolicy] = useState({
     title: '',
@@ -38,7 +38,7 @@ const Policies = () => {
   const filteredPolicies = policies.filter(policy => {
     const matchesSearch = policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          policy.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter ? policy.category === categoryFilter : true;
+    const matchesCategory = categoryFilter === 'all' ? true : policy.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 

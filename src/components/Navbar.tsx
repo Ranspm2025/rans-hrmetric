@@ -95,9 +95,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-white font-bold">ES</span>
+            <span className="text-white font-bold">GM</span>
           </div>
-          <span className="font-semibold text-lg">EmpScaler</span>
+          <span className="font-semibold text-lg">GrowMetric</span>
         </Link>
 
         {/* Desktop Navigation */}
