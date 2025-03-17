@@ -55,6 +55,7 @@ const Navbar = () => {
       
       if (isKaryawan) {
         links.push({ path: '/documents', label: 'Dokumen Saya' });
+        links.push({ path: '/upload-document', label: 'Upload Dokumen' });
       } else {
         links.push({ path: '/documents', label: 'Dokumen' });
       }

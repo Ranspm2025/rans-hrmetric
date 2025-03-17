@@ -1,9 +1,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Filter, Plus, FileText, Clock, Calendar } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import PolicyCard from '@/components/PolicyCard';
 import { policies } from '@/lib/data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 const Policies = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,6 +73,22 @@ const Policies = () => {
       category: '',
       description: '',
     });
+  };
+
+  // Helper function to get the color for the category badge
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'SDM':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'Manajemen':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'Umum':
+        return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'Keuangan':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
   };
 
   return (
@@ -200,7 +224,41 @@ const Policies = () => {
             </div>
           ) : (
             filteredPolicies.map((policy, index) => (
-              <PolicyCard key={policy.id} policy={policy} index={index} />
+              <motion.div
+                key={policy.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-md transition-all duration-300">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-lg">{policy.title}</CardTitle>
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${getCategoryColor(policy.category)}`}
+                      >
+                        {policy.category}
+                      </Badge>
+                    </div>
+                    <CardDescription className="flex items-center gap-1 text-xs">
+                      <Clock className="h-3.5 w-3.5" />
+                      <span>Terakhir diperbarui: {policy.lastUpdated}</span>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {policy.description}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="border-t pt-4">
+                    <Button variant="outline" size="sm" className="w-full gap-1">
+                      <FileText className="h-3.5 w-3.5" />
+                      Baca Selengkapnya
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
             ))
           )}
         </div>

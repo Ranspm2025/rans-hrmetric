@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { Calendar, Star, User } from 'lucide-react';
+import { Calendar, Star, User, Edit, Trash, Eye } from 'lucide-react';
 import { Employee, getPromotionScore } from '@/lib/data';
 import { 
   Card, 
@@ -14,6 +14,19 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -22,6 +35,9 @@ interface EmployeeCardProps {
 
 const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
   const promotionScore = getPromotionScore(employee);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { toast } = useToast();
+  const { isAdmin, isManager } = useAuth();
   
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-500';
@@ -35,6 +51,15 @@ const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
     if (score >= 80) return 'bg-blue-500';
     if (score >= 70) return 'bg-yellow-500';
     return 'bg-red-500';
+  };
+
+  const handleDelete = () => {
+    // In a real app, this would delete from the database
+    toast({
+      title: "Karyawan dihapus",
+      description: `${employee.name} telah dihapus dari sistem`,
+    });
+    setShowDeleteDialog(false);
   };
 
   return (
@@ -91,14 +116,49 @@ const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="border-t bg-muted/20 px-3 py-2">
-          <Button variant="ghost" size="sm" className="w-full text-xs" asChild>
+        <CardFooter className="border-t bg-muted/20 px-3 py-2 grid grid-cols-3 gap-1">
+          <Button variant="ghost" size="sm" className="text-xs" asChild>
             <Link to={`/evaluation?employeeId=${employee.id}`}>
-              Detail Penilaian
+              <Eye className="h-3.5 w-3.5 mr-1" />
+              Detail
             </Link>
           </Button>
+          
+          {(isAdmin || isManager) && (
+            <>
+              <Button variant="ghost" size="sm" className="text-xs" asChild>
+                <Link to={`/manage-employees?edit=${employee.id}`}>
+                  <Edit className="h-3.5 w-3.5 mr-1" />
+                  Edit
+                </Link>
+              </Button>
+              
+              <Button variant="ghost" size="sm" className="text-xs text-destructive" 
+                onClick={() => setShowDeleteDialog(true)}>
+                <Trash className="h-3.5 w-3.5 mr-1" />
+                Hapus
+              </Button>
+            </>
+          )}
         </CardFooter>
       </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Karyawan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus {employee.name}? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };
