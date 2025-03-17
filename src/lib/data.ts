@@ -1,4 +1,3 @@
-
 export interface Policy {
   id: string;
   title: string;
@@ -24,6 +23,24 @@ export interface EvaluationCriteria {
   category: 'performance' | 'personality';
   weight: number;
   description: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'manager' | 'karyawan' | 'pemimpin';
+  avatar: string;
+}
+
+export interface Document {
+  id: string;
+  title: string;
+  employeeId: string;
+  uploadedAt: string;
+  fileUrl: string;
+  status: 'pending' | 'reviewed' | 'approved';
+  comments?: string;
 }
 
 export const policies: Policy[] = [
@@ -207,6 +224,57 @@ export const evaluationCriteria: EvaluationCriteria[] = [
   },
 ];
 
+export const users: User[] = [
+  {
+    id: '1',
+    name: 'Admin Utama',
+    email: 'admin@empscaler.com',
+    role: 'admin',
+    avatar: 'https://i.pravatar.cc/150?img=11',
+  },
+  {
+    id: '2',
+    name: 'Budi Santoso',
+    email: 'budi@empscaler.com',
+    role: 'manager',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+  },
+  {
+    id: '3',
+    name: 'Siti Rahayu',
+    email: 'siti@empscaler.com',
+    role: 'karyawan',
+    avatar: 'https://i.pravatar.cc/150?img=5',
+  },
+  {
+    id: '4',
+    name: 'Direktur Utama',
+    email: 'direktur@empscaler.com',
+    role: 'pemimpin',
+    avatar: 'https://i.pravatar.cc/150?img=12',
+  },
+];
+
+export const documents: Document[] = [
+  {
+    id: '1',
+    title: 'Evaluasi Kinerja Q1 2024',
+    employeeId: '3',
+    uploadedAt: '2024-03-15',
+    fileUrl: '/placeholder.svg',
+    status: 'reviewed',
+    comments: 'Dokumen sudah direview, perlu revisi minor',
+  },
+  {
+    id: '2',
+    title: 'Laporan Pencapaian Target',
+    employeeId: '6',
+    uploadedAt: '2024-03-10',
+    fileUrl: '/placeholder.svg',
+    status: 'approved',
+  },
+];
+
 export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
 };
@@ -223,4 +291,41 @@ export const getEmployeeById = (id: string): Employee | undefined => {
 
 export const getPolicyById = (id: string): Policy | undefined => {
   return policies.find(policy => policy.id === id);
+};
+
+export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
+  const newCriteria: EvaluationCriteria = {
+    ...criteria,
+    id: (evaluationCriteria.length + 1).toString(),
+  };
+  evaluationCriteria.push(newCriteria);
+  return newCriteria;
+};
+
+export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
+  const newEmployee: Employee = {
+    ...employee,
+    id: (employees.length + 1).toString(),
+    performance: 0,
+    personality: 0,
+  };
+  employees.push(newEmployee);
+  return newEmployee;
+};
+
+export const getUserByEmailAndPassword = (email: string, password: string): User | undefined => {
+  return users.find(user => user.email === email);
+};
+
+export const getCurrentUser = (): User | null => {
+  const storedUser = localStorage.getItem('currentUser');
+  return storedUser ? JSON.parse(storedUser) : null;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('currentUser');
+  }
 };

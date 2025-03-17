@@ -1,14 +1,26 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X, ChevronRight, LogOut, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,12 +40,43 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
-  const navLinks = [
-    { path: '/', label: 'Dashboard' },
-    { path: '/policies', label: 'Kebijakan' },
-    { path: '/employees', label: 'Karyawan' },
-    { path: '/evaluation', label: 'Penilaian' },
-  ];
+  const getNavLinks = () => {
+    const links = [
+      { path: '/', label: 'Dashboard' },
+      { path: '/policies', label: 'Kebijakan' },
+    ];
+    
+    if (isAuthenticated) {
+      links.push({ path: '/employees', label: 'Karyawan' });
+      
+      if (isAdmin || isManager) {
+        links.push({ path: '/manage-employees', label: 'Kelola Karyawan' });
+      }
+      
+      if (isKaryawan) {
+        links.push({ path: '/documents', label: 'Dokumen Saya' });
+      } else {
+        links.push({ path: '/documents', label: 'Dokumen' });
+      }
+      
+      if (isManager || isAdmin || isPemimpin) {
+        links.push({ path: '/evaluation', label: 'Penilaian' });
+      }
+      
+      if (isManager || isAdmin) {
+        links.push({ path: '/criteria', label: 'Kriteria' });
+      }
+    }
+    
+    return links;
+  };
+
+  const navLinks = getNavLinks();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <motion.nav
@@ -79,7 +122,44 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <Button>Masuk</Button>
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.role}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Pengaturan</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Keluar</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button asChild>
+              <Link to="/login">Masuk</Link>
+            </Button>
+          )}
         </div>
 
         <button
@@ -115,7 +195,29 @@ const Navbar = () => {
                 <ChevronRight size={16} />
               </Link>
             ))}
-            <Button className="mt-4">Masuk</Button>
+            
+            {isAuthenticated ? (
+              <>
+                <div className="py-3 mt-2 border-t border-border flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.role}</p>
+                  </div>
+                </div>
+                <Button variant="outline" className="mt-4" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Keluar
+                </Button>
+              </>
+            ) : (
+              <Button className="mt-4" asChild>
+                <Link to="/login">Masuk</Link>
+              </Button>
+            )}
           </div>
         </motion.div>
       )}
