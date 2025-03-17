@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, FileText, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,7 +15,8 @@ const DocumentUpload = () => {
   const [documentTitle, setDocumentTitle] = useState('');
   const [documentDescription, setDocumentDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const { isAuthenticated, isKaryawan, user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated, isKaryawan } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -31,16 +31,15 @@ const DocumentUpload = () => {
     
     if (!file) {
       toast({
-        title: "File Diperlukan",
-        description: "Silakan pilih file untuk diunggah",
-        variant: "destructive",
+        title: 'File Diperlukan',
+        description: 'Silakan pilih file untuk diunggah',
+        variant: 'destructive',
       });
       return;
     }
     
-    // In a real app, this would upload to the server
     toast({
-      title: "Dokumen Berhasil Diunggah",
+      title: 'Dokumen Berhasil Diunggah',
       description: `${documentTitle} telah diunggah dan menunggu review`,
     });
     
@@ -67,7 +66,6 @@ const DocumentUpload = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
       <div className="container mx-auto px-4 pt-32 pb-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -81,13 +79,10 @@ const DocumentUpload = () => {
               Kembali ke Dokumen
             </Link>
           </Button>
-          
           <h1 className="text-3xl font-bold">Unggah Dokumen Evaluasi</h1>
-          <p className="text-muted-foreground">
-            Unggah dokumen terkait evaluasi kinerja Anda
-          </p>
+          <p className="text-muted-foreground">Unggah dokumen terkait evaluasi kinerja Anda</p>
         </motion.div>
-        
+
         <div className="max-w-md mx-auto">
           <Card>
             <form onSubmit={handleSubmit}>
@@ -111,7 +106,6 @@ const DocumentUpload = () => {
                     required
                   />
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="description">Deskripsi</Label>
                   <Textarea
@@ -122,7 +116,6 @@ const DocumentUpload = () => {
                     className="min-h-24"
                   />
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="file">Pilih File</Label>
                   <div className="border border-dashed border-input rounded-md p-6 text-center">
@@ -133,14 +126,15 @@ const DocumentUpload = () => {
                     <p className="text-xs text-muted-foreground mb-4">
                       Format yang didukung: PDF, DOCX, JPG, PNG (Maks. 10MB)
                     </p>
-                    <Input
+                    <input
                       id="file"
                       type="file"
                       className="hidden"
+                      ref={fileInputRef}
                       onChange={handleFileChange}
                       required
                     />
-                    <Button type="button" variant="outline" onClick={() => document.getElementById('file')?.click()}>
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
                       Pilih File
                     </Button>
                     {file && (
