@@ -1,11 +1,10 @@
-
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Menu, X, ChevronRight, LogOut, User, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Menu, X, ChevronRight, LogOut, User, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,63 +22,30 @@ const Navbar = () => {
   const { user, logout, isAuthenticated, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
 
   useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     setIsOpen(false);
-  }, [location]);
+  }, [location.pathname]);
 
-  const getNavLinks = () => {
-    const links = [
-      { path: '/', label: 'Dashboard' },
-      { path: '/policies', label: 'Kebijakan' },
-    ];
-    
-    if (isAuthenticated) {
-      links.push({ path: '/employees', label: 'Karyawan' });
-      
-      if (isAdmin || isManager) {
-        links.push({ path: '/manage-employees', label: 'Kelola Karyawan' });
-      }
-      
-      if (isKaryawan) {
-        links.push({ path: '/documents', label: 'Dokumen Saya' });
-      } else {
-        links.push({ path: '/documents', label: 'Dokumen' });
-      }
-      
-      if (isManager || isAdmin) {
-        links.push({ path: '/evaluation', label: 'Penilaian' });
-      }
-      
-      if (isPemimpin) {
-        links.push({ path: '/manager-evaluations', label: 'Evaluasi Manager' });
-      }
-      
-      if (isManager || isAdmin) {
-        links.push({ path: '/criteria', label: 'Kriteria' });
-      }
-    }
-    
-    return links;
-  };
-
-  const navLinks = getNavLinks();
+  const navLinks = [
+    { path: "/", label: "Dashboard" },
+    { path: "/policies", label: "Kebijakan" },
+    ...(isAuthenticated ? [{ path: "/employees", label: "Karyawan" }] : []),
+    ...(isAuthenticated && (isAdmin || isManager) ? [{ path: "/manage-employees", label: "Kelola Karyawan" }] : []),
+    ...(isAuthenticated ? [{ path: isKaryawan ? "/documents" : "/documents", label: isKaryawan ? "Dokumen Saya" : "Dokumen" }] : []),
+    ...(isAuthenticated && (isManager || isAdmin) ? [{ path: "/evaluation", label: "Penilaian" }] : []),
+    ...(isAuthenticated && isPemimpin ? [{ path: "/manager-evaluations", label: "Evaluasi Manager" }] : []),
+    ...(isAuthenticated && (isManager || isAdmin) ? [{ path: "/criteria", label: "Kriteria" }] : []),
+  ];
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -87,9 +53,7 @@ const Navbar = () => {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className={`fixed top-0 left-0 right-0 z-50 ${
-        scrolled ? 'glassmorphism py-3' : 'bg-transparent py-5'
-      } transition-all duration-300`}
+      className={`fixed top-0 left-0 right-0 z-50 ${scrolled ? "glassmorphism py-3" : "bg-transparent py-5"} transition-all duration-300`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
@@ -106,9 +70,7 @@ const Navbar = () => {
               key={link.path}
               to={link.path}
               className={`text-sm font-medium transition-colors relative ${
-                location.pathname === link.path
-                  ? 'text-primary'
-                  : 'text-foreground/80 hover:text-foreground'
+                location.pathname === link.path ? "text-primary" : "text-foreground/80 hover:text-foreground"
               }`}
             >
               {link.label}
@@ -125,6 +87,7 @@ const Navbar = () => {
           ))}
         </div>
 
+        {/* User Dropdown */}
         <div className="hidden md:block">
           {isAuthenticated ? (
             <DropdownMenu>
@@ -166,61 +129,30 @@ const Navbar = () => {
           )}
         </div>
 
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-foreground"
-          aria-label="Toggle Menu"
-        >
+        {/* Mobile Menu Button */}
+        <button onClick={() => setIsOpen((prev) => !prev)} className="md:hidden text-foreground" aria-label="Toggle Menu">
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
-          className="md:hidden glassmorphism border-t"
-        >
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="md:hidden glassmorphism border-t">
           <div className="container mx-auto px-4 py-4 flex flex-col">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`py-3 flex items-center justify-between ${
-                  location.pathname === link.path
-                    ? 'text-primary font-medium'
-                    : 'text-foreground/80'
-                }`}
-              >
+              <Link key={link.path} to={link.path} className={`py-3 flex items-center justify-between ${location.pathname === link.path ? "text-primary font-medium" : "text-foreground/80"}`}>
                 <span>{link.label}</span>
                 <ChevronRight size={16} />
               </Link>
             ))}
-            
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <>
-                <div className="py-3 mt-2 border-t border-border flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar} alt={user?.name} />
-                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{user?.name}</p>
-                    <p className="text-xs text-muted-foreground">{user?.role}</p>
-                  </div>
-                </div>
-                <Button variant="outline" className="mt-4" onClick={handleLogout}>
+                <DropdownMenuSeparator />
+                <Button variant="outline" className="mt-4 w-full" onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Keluar
                 </Button>
               </>
-            ) : (
-              <Button className="mt-4" asChild>
-                <Link to="/login">Masuk</Link>
-              </Button>
             )}
           </div>
         </motion.div>
