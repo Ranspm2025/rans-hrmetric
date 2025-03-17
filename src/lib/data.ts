@@ -1,3 +1,4 @@
+
 export interface Policy {
   id: string;
   title: string;
@@ -41,6 +42,22 @@ export interface Document {
   fileUrl: string;
   status: 'pending' | 'reviewed' | 'approved';
   comments?: string;
+}
+
+export interface Evaluation {
+  id: string;
+  employeeId: string;
+  managerId: string;
+  date: string;
+  criteriaScores: {
+    criteriaId: string;
+    score: number;
+    comment?: string;
+  }[];
+  overallComment?: string;
+  approved?: boolean;
+  approvedById?: string;
+  approvedDate?: string;
 }
 
 export const policies: Policy[] = [
@@ -275,6 +292,37 @@ export const documents: Document[] = [
   },
 ];
 
+export const evaluations: Evaluation[] = [
+  {
+    id: '1',
+    employeeId: '3',
+    managerId: '2',
+    date: '2024-03-15',
+    criteriaScores: [
+      { criteriaId: '1', score: 90 },
+      { criteriaId: '2', score: 85 },
+      { criteriaId: '4', score: 92 },
+    ],
+    overallComment: 'Kinerja yang sangat baik dalam project terakhir',
+    approved: false,
+  },
+  {
+    id: '2',
+    employeeId: '6',
+    managerId: '2',
+    date: '2024-03-10',
+    criteriaScores: [
+      { criteriaId: '1', score: 88 },
+      { criteriaId: '2', score: 82 },
+      { criteriaId: '4', score: 90 },
+    ],
+    overallComment: 'Konsisten dalam mencapai target',
+    approved: true,
+    approvedById: '4',
+    approvedDate: '2024-03-12',
+  },
+];
+
 export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
 };
@@ -326,4 +374,41 @@ export const setCurrentUser = (user: User | null): void => {
   } else {
     localStorage.removeItem('currentUser');
   }
+};
+
+export const getEvaluationsByEmployeeId = (employeeId: string): Evaluation[] => {
+  return evaluations.filter(eval => eval.employeeId === employeeId);
+};
+
+export const getEvaluationsPendingApproval = (): Evaluation[] => {
+  return evaluations.filter(eval => !eval.approved);
+};
+
+export const approveEvaluation = (evaluationId: string, approverId: string): void => {
+  const evaluation = evaluations.find(eval => eval.id === evaluationId);
+  if (evaluation) {
+    evaluation.approved = true;
+    evaluation.approvedById = approverId;
+    evaluation.approvedDate = new Date().toISOString().split('T')[0];
+  }
+};
+
+export const addDocument = (doc: Omit<Document, 'id' | 'status' | 'uploadedAt'>): Document => {
+  const newDoc: Document = {
+    ...doc,
+    id: (documents.length + 1).toString(),
+    status: 'pending',
+    uploadedAt: new Date().toISOString().split('T')[0],
+  };
+  documents.push(newDoc);
+  return newDoc;
+};
+
+export const updateDocument = (id: string, updates: Partial<Document>): Document | undefined => {
+  const docIndex = documents.findIndex(doc => doc.id === id);
+  if (docIndex >= 0) {
+    documents[docIndex] = { ...documents[docIndex], ...updates };
+    return documents[docIndex];
+  }
+  return undefined;
 };

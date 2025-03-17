@@ -16,6 +16,7 @@ import Documents from "./pages/Documents";
 import DocumentUpload from "./pages/DocumentUpload";
 import ManageEmployees from "./pages/ManageEmployees";
 import CriteriaPage from "./pages/CriteriaPage";
+import ManagerEvaluations from "./pages/ManagerEvaluations";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,15 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin']}>
               <Evaluation />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/manager-evaluations" 
+          element={
+            <ProtectedRoute requiredRoles={['pemimpin']}>
+              <ManagerEvaluations />
             </ProtectedRoute>
           } 
         />

@@ -59,8 +59,12 @@ const Navbar = () => {
         links.push({ path: '/documents', label: 'Dokumen' });
       }
       
-      if (isManager || isAdmin || isPemimpin) {
+      if (isManager || isAdmin) {
         links.push({ path: '/evaluation', label: 'Penilaian' });
+      }
+      
+      if (isPemimpin) {
+        links.push({ path: '/manager-evaluations', label: 'Evaluasi Manager' });
       }
       
       if (isManager || isAdmin) {

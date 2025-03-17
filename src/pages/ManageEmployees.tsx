@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, UserPlus, Users } from 'lucide-react';
+import { Plus, Search, UserPlus, Users, Trash2, Pencil, Eye } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { employees, addEmployee } from '@/lib/data';
@@ -9,14 +9,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const ManageEmployees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<(typeof employees)[0] | null>(null);
   const [newEmployee, setNewEmployee] = useState({
     name: '',
     position: '',
@@ -72,6 +86,43 @@ const ManageEmployees = () => {
       performance: 0,
       personality: 0,
     });
+  };
+
+  const handleDeleteEmployee = () => {
+    if (selectedEmployee) {
+      // In a real app, this would delete from the database
+      toast({
+        title: "Karyawan Berhasil Dihapus",
+        description: `${selectedEmployee.name} telah dihapus dari sistem`,
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedEmployee(null);
+    }
+  };
+
+  const handleUpdateEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, this would update the database
+    toast({
+      title: "Data Karyawan Diperbarui",
+      description: `Informasi ${selectedEmployee?.name} telah diperbarui`,
+    });
+    setIsEditDialogOpen(false);
+  };
+
+  const openDetailDialog = (employee: (typeof employees)[0]) => {
+    setSelectedEmployee(employee);
+    setIsDetailDialogOpen(true);
+  };
+
+  const openEditDialog = (employee: (typeof employees)[0]) => {
+    setSelectedEmployee(employee);
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (employee: (typeof employees)[0]) => {
+    setSelectedEmployee(employee);
+    setIsDeleteDialogOpen(true);
   };
 
   if (!isAuthenticated || (!isAdmin && !isManager)) {
@@ -243,8 +294,18 @@ const ManageEmployees = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Detail</Button>
-                      <Button variant="outline" size="sm">Edit</Button>
+                      <Button variant="outline" size="sm" onClick={() => openDetailDialog(employee)}>
+                        <Eye className="h-3.5 w-3.5 mr-1" />
+                        Detail
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => openEditDialog(employee)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => openDeleteDialog(employee)}>
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        Hapus
+                      </Button>
                     </div>
                   </motion.div>
                 ))
@@ -253,6 +314,135 @@ const ManageEmployees = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Employee Detail Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detail Karyawan</DialogTitle>
+          </DialogHeader>
+          {selectedEmployee && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage src={selectedEmployee.avatar} alt={selectedEmployee.name} />
+                  <AvatarFallback>{selectedEmployee.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">{selectedEmployee.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedEmployee.position}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Departemen:</span>
+                  <span className="font-medium">{selectedEmployee.department}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tanggal Bergabung:</span>
+                  <span className="font-medium">{selectedEmployee.hireDate}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Nilai Kinerja:</span>
+                  <span className="font-medium">{selectedEmployee.performance}/100</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Nilai Kepribadian:</span>
+                  <span className="font-medium">{selectedEmployee.personality}/100</span>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsDetailDialogOpen(false)}>Tutup</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employee Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Karyawan</DialogTitle>
+          </DialogHeader>
+          {selectedEmployee && (
+            <form onSubmit={handleUpdateEmployee}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Nama Lengkap</Label>
+                  <Input
+                    id="edit-name"
+                    defaultValue={selectedEmployee.name}
+                    placeholder="Masukkan nama lengkap"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-position">Jabatan</Label>
+                  <Input
+                    id="edit-position"
+                    defaultValue={selectedEmployee.position}
+                    placeholder="Masukkan jabatan"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-department">Departemen</Label>
+                  <Select defaultValue={selectedEmployee.department}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="edit-hireDate">Tanggal Bergabung</Label>
+                  <Input
+                    id="edit-hireDate"
+                    type="date"
+                    defaultValue={selectedEmployee.hireDate}
+                    required
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Batal
+                </Button>
+                <Button type="submit">Simpan Perubahan</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus Karyawan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus {selectedEmployee?.name}? Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDeleteEmployee}>
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

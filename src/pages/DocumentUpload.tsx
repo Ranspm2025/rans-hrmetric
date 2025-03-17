@@ -1,24 +1,22 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, File, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Upload, FileText, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { documents } from '@/lib/data';
 
 const DocumentUpload = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [documentTitle, setDocumentTitle] = useState('');
+  const [documentDescription, setDocumentDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const { user } = useAuth();
+  const { isAuthenticated, isKaryawan, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -30,31 +28,41 @@ const DocumentUpload = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
-
-    // Simulate uploading
-    setTimeout(() => {
-      // Add to documents array (in a real app, this would be an API call)
-      const newDocument = {
-        id: (documents.length + 1).toString(),
-        title,
-        employeeId: user?.id || '0',
-        uploadedAt: new Date().toISOString().split('T')[0],
-        fileUrl: '/placeholder.svg',
-        status: 'pending' as const,
-      };
-      
-      documents.push(newDocument);
-      
+    
+    if (!file) {
       toast({
-        title: "Dokumen Berhasil Diunggah",
-        description: "Dokumen Anda telah berhasil diunggah dan menunggu review",
+        title: "File Diperlukan",
+        description: "Silakan pilih file untuk diunggah",
+        variant: "destructive",
       });
-      
-      setUploading(false);
-      navigate('/documents');
-    }, 1500);
+      return;
+    }
+    
+    // In a real app, this would upload to the server
+    toast({
+      title: "Dokumen Berhasil Diunggah",
+      description: `${documentTitle} telah diunggah dan menunggu review`,
+    });
+    
+    navigate('/documents');
   };
+
+  if (!isAuthenticated || !isKaryawan) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-32 pb-20 text-center">
+          <h1 className="text-3xl font-bold">Akses Ditolak</h1>
+          <p className="text-muted-foreground mt-2">
+            Hanya karyawan yang dapat mengunggah dokumen penilaian.
+          </p>
+          <Button className="mt-6" asChild>
+            <Link to="/documents">Kembali ke Dokumen</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -65,106 +73,93 @@ const DocumentUpload = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-wrap items-center justify-between gap-4 mb-8"
+          className="mb-6"
         >
-          <div>
-            <h1 className="text-3xl font-bold">Unggah Dokumen Evaluasi</h1>
-            <p className="text-muted-foreground">
-              Unggah dokumen evaluasi kinerja dan hasil pencapaian Anda
-            </p>
-          </div>
+          <Button variant="outline" size="sm" asChild className="mb-6">
+            <Link to="/documents">
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Kembali ke Dokumen
+            </Link>
+          </Button>
+          
+          <h1 className="text-3xl font-bold">Unggah Dokumen Evaluasi</h1>
+          <p className="text-muted-foreground">
+            Unggah dokumen terkait evaluasi kinerja Anda
+          </p>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
+        
+        <div className="max-w-md mx-auto">
           <Card>
             <form onSubmit={handleSubmit}>
               <CardHeader>
-                <CardTitle>Form Unggah Dokumen</CardTitle>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle>Formulir Unggah Dokumen</CardTitle>
+                </div>
                 <CardDescription>
-                  Lengkapi informasi dan unggah dokumen evaluasi kinerja Anda
+                  Lengkapi informasi dokumen di bawah ini
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Judul Dokumen</Label>
-                  <Input 
-                    id="title" 
-                    value={title} 
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Masukkan judul dokumen" 
+                  <Input
+                    id="title"
+                    placeholder="Masukkan judul dokumen"
+                    value={documentTitle}
+                    onChange={(e) => setDocumentTitle(e.target.value)}
                     required
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="description">Deskripsi</Label>
-                  <Textarea 
-                    id="description" 
-                    value={description} 
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Deskripsi singkat tentang dokumen ini" 
-                    rows={3}
+                  <Textarea
+                    id="description"
+                    placeholder="Deskripsi singkat tentang dokumen ini"
+                    value={documentDescription}
+                    onChange={(e) => setDocumentDescription(e.target.value)}
+                    className="min-h-24"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="file">Upload File</Label>
-                  {!file ? (
-                    <div className="border-2 border-dashed border-border rounded-md p-6 text-center hover:border-primary/50 transition-colors">
-                      <Input 
-                        id="file" 
-                        type="file" 
-                        className="hidden" 
-                        onChange={handleFileChange}
-                        required
-                      />
-                      <Label htmlFor="file" className="cursor-pointer block">
-                        <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-sm font-medium">Klik untuk memilih file</p>
-                        <p className="text-xs text-muted-foreground mt-1">PDF, DOC, DOCX, XLS, XLSX (Maks. 10MB)</p>
-                      </Label>
-                    </div>
-                  ) : (
-                    <div className="flex items-center p-3 border rounded-md">
-                      <File className="h-5 w-5 text-primary mr-2" />
-                      <span className="text-sm flex-1 truncate">{file.name}</span>
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0" 
-                        onClick={() => setFile(null)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                  <Label htmlFor="file">Pilih File</Label>
+                  <div className="border border-dashed border-input rounded-md p-6 text-center">
+                    <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Klik untuk memilih atau seret file ke sini
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      Format yang didukung: PDF, DOCX, JPG, PNG (Maks. 10MB)
+                    </p>
+                    <Input
+                      id="file"
+                      type="file"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      required
+                    />
+                    <Button type="button" variant="outline" onClick={() => document.getElementById('file')?.click()}>
+                      Pilih File
+                    </Button>
+                    {file && (
+                      <p className="text-sm mt-2 text-primary font-medium">
+                        {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </p>
+                    )}
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter className="border-t p-6 bg-muted/20">
-                <div className="flex justify-end w-full gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => navigate('/documents')}
-                  >
-                    Batal
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={uploading || !file}
-                  >
-                    {uploading ? 'Mengunggah...' : 'Unggah Dokumen'}
-                  </Button>
-                </div>
+              <CardFooter>
+                <Button type="submit" className="w-full">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Unggah Dokumen
+                </Button>
               </CardFooter>
             </form>
           </Card>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
