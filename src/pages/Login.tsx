@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Mail, Info } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -36,8 +37,9 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="w-full max-w-md px-4"
       >
-        <Card className="w-[350px] shadow-md">
+        <Card className="shadow-md">
           <CardHeader className="space-y-2 text-center">
             <div className="flex justify-center">
               <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
@@ -85,12 +87,20 @@ const Login = () => {
                 {loading ? 'Memproses...' : 'Masuk'}
               </Button>
             </form>
+            
+            <Alert className="mt-6">
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                <p className="text-sm font-medium mb-2">Demo Akun:</p>
+                <ul className="text-xs space-y-1 text-muted-foreground">
+                  <li><strong>Admin:</strong> admin@empscaler.com (password apa saja)</li>
+                  <li><strong>Manager:</strong> budi@empscaler.com (password apa saja)</li>
+                  <li><strong>Karyawan:</strong> siti@empscaler.com (password apa saja)</li>
+                  <li><strong>Pimpinan:</strong> ahmad@empscaler.com (password apa saja)</li>
+                </ul>
+              </AlertDescription>
+            </Alert>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-xs text-muted-foreground">
-              Demo: admin@empscaler.com (admin), budi@empscaler.com (manager), siti@empscaler.com (karyawan)
-            </p>
-          </CardFooter>
         </Card>
       </motion.div>
     </div>

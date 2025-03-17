@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Policies from "./pages/Policies";
+import PolicyDetail from "./pages/PolicyDetail";
 import Employees from "./pages/Employees";
 import Evaluation from "./pages/Evaluation";
 import NotFound from "./pages/NotFound";
@@ -42,6 +43,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/policies" element={<Policies />} />
+        <Route path="/policy/:id" element={<PolicyDetail />} />
         <Route path="/employees" element={<Employees />} />
         
         <Route 
