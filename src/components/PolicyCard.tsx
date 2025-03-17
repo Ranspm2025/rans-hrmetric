@@ -1,24 +1,23 @@
-
-import { motion } from 'framer-motion';
-import { Calendar, FileText } from 'lucide-react';
-import { Policy } from '@/lib/data';
-import { Button } from '@/components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Dialog, 
+import { motion } from "framer-motion";
+import { Calendar, FileText } from "lucide-react";
+import { Policy } from "@/lib/data";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 interface PolicyCardProps {
@@ -27,6 +26,11 @@ interface PolicyCardProps {
 }
 
 const PolicyCard = ({ policy, index }: PolicyCardProps) => {
+  const truncatedDescription =
+    policy.description && policy.description.length > 120
+      ? `${policy.description.substring(0, 120)}...`
+      : policy.description;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,7 +42,7 @@ const PolicyCard = ({ policy, index }: PolicyCardProps) => {
           <div className="flex justify-between items-start">
             <Badge>{policy.category}</Badge>
             <div className="flex items-center text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3 mr-1" />
+              <Calendar className="h-3 w-3 mr-1" aria-hidden="true" />
               {policy.lastUpdated}
             </div>
           </div>
@@ -46,9 +50,7 @@ const PolicyCard = ({ policy, index }: PolicyCardProps) => {
         </CardHeader>
         <CardContent>
           <CardDescription className="text-sm text-muted-foreground">
-            {policy.description.length > 120 
-              ? `${policy.description.substring(0, 120)}...` 
-              : policy.description}
+            {truncatedDescription}
           </CardDescription>
         </CardContent>
         <CardFooter>
@@ -56,7 +58,7 @@ const PolicyCard = ({ policy, index }: PolicyCardProps) => {
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1 text-xs">
                 <span>Lihat Detail</span>
-                <FileText className="h-3 w-3" />
+                <FileText className="h-3 w-3" aria-hidden="true" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
