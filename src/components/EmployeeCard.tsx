@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { Calendar, Star, User, Edit, Trash, Eye, Award } from 'lucide-react';
 import { Employee, getPromotionScore } from '@/lib/data';
@@ -58,7 +59,7 @@ const EmployeeCard = ({ employee, index, onEvaluate, onPromote }: EmployeeCardPr
     // In a real app, this would delete from the database
     toast({
       title: "Karyawan dihapus",
-      description: ${employee.name} telah dihapus dari sistem,
+      description: `${employee.name} telah dihapus dari sistem`,
     });
     setShowDeleteDialog(false);
   };
@@ -123,7 +124,7 @@ const EmployeeCard = ({ employee, index, onEvaluate, onPromote }: EmployeeCardPr
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                 <span className="text-sm font-medium">Skor Promosi</span>
               </div>
-              <span className={text-lg font-semibold ${getScoreColor(promotionScore)}}>
+              <span className={`text-lg font-semibold ${getScoreColor(promotionScore)}`}>
                 {promotionScore.toFixed(1)}
               </span>
             </div>
@@ -138,7 +139,7 @@ const EmployeeCard = ({ employee, index, onEvaluate, onPromote }: EmployeeCardPr
           {(isAdmin || isManager) && (
             <>
               <Button variant="ghost" size="sm" className="text-xs h-8" asChild>
-                <Link to={/employees?edit=${employee.id}}>
+                <Link to={`/employees?edit=${employee.id}`}>
                   <Edit className="h-3.5 w-3.5 mr-1" />
                   Edit
                 </Link>
@@ -175,7 +176,7 @@ const EmployeeCard = ({ employee, index, onEvaluate, onPromote }: EmployeeCardPr
               className="text-xs text-green-600 h-8" 
               onClick={() => toast({
                 title: "Persetujuan",
-                description: Promosi ${employee.name} telah disetujui.,
+                description: `Promosi ${employee.name} telah disetujui.`,
               })}
             >
               <Award className="h-3.5 w-3.5 mr-1" />

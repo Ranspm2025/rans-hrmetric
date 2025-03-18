@@ -1,40 +1,41 @@
-import { useMemo } from 'react';
+
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useNavLinks = () => {
   const { isAuthenticated, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
-
-  const navLinks = useMemo(() => {
-    let links = [
+  
+  const getNavLinks = () => {
+    const links = [
       { path: '/', label: 'Dashboard' },
       { path: '/policies', label: 'Kebijakan' },
     ];
-
+    
     if (isAuthenticated) {
+      // All authenticated users can see Employees link
       links.push({ path: '/employees', label: 'Karyawan' });
-
-      // Akses berdasarkan peran
+      
       if (isKaryawan) {
-        links.push(
-          { path: '/documents', label: 'Dokumen Saya' },
-          { path: '/upload-document', label: 'Upload Dokumen' }
-        );
+        links.push({ path: '/documents', label: 'Dokumen Saya' });
+        links.push({ path: '/upload-document', label: 'Upload Dokumen' });
       } else {
         links.push({ path: '/documents', label: 'Dokumen' });
       }
-
+      
       if (isManager || isAdmin) {
         links.push({ path: '/evaluation', label: 'Penilaian' });
-        links.push({ path: '/criteria', label: 'Kriteria' });
       }
-
+      
       if (isPemimpin) {
         links.push({ path: '/manager-evaluations', label: 'Evaluasi Manager' });
       }
+      
+      if (isManager || isAdmin) {
+        links.push({ path: '/criteria', label: 'Kriteria' });
+      }
     }
-
+    
     return links;
-  }, [isAuthenticated, isAdmin, isManager, isPemimpin, isKaryawan]);
+  };
 
-  return navLinks;
+  return getNavLinks();
 };
