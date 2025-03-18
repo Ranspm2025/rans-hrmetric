@@ -1,3 +1,4 @@
+
 export interface Policy {
   id: string;
   title: string;
@@ -162,28 +163,28 @@ export const users: User[] = [
   {
     id: '1',
     name: 'Admin',
-    email: 'admin@empscaler.com',
+    email: 'admin@hrmetric.com',
     role: 'admin',
     avatar: 'https://i.pravatar.cc/150?img=67',
   },
   {
     id: '2',
     name: 'Budi Santoso',
-    email: 'budi@empscaler.com',
+    email: 'budi@hrmetric.com',
     role: 'manager',
     avatar: 'https://i.pravatar.cc/150?img=68',
   },
   {
     id: '3',
     name: 'Siti Rahayu',
-    email: 'siti@empscaler.com',
+    email: 'siti@hrmetric.com',
     role: 'karyawan',
     avatar: 'https://i.pravatar.cc/150?img=47',
   },
   {
     id: '4',
     name: 'Ahmad Direktur',
-    email: 'ahmad@empscaler.com',
+    email: 'ahmad@hrmetric.com',
     role: 'pemimpin',
     avatar: 'https://i.pravatar.cc/150?img=60',
   },

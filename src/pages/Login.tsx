@@ -43,10 +43,10 @@ const Login = () => {
           <CardHeader className="space-y-2 text-center">
             <div className="flex justify-center">
               <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-                <span className="text-white font-bold text-xl">ES</span>
+                <span className="text-white font-bold text-xl">HR</span>
               </div>
             </div>
-            <CardTitle className="text-2xl">Masuk ke EmpScaler</CardTitle>
+            <CardTitle className="text-2xl">Masuk ke HRmetric</CardTitle>
             <CardDescription>
               Masukkan email dan password untuk mengakses sistem
             </CardDescription>
@@ -60,7 +60,7 @@ const Login = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="email@empscaler.com"
+                    placeholder="email@hrmetric.com"
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -93,10 +93,10 @@ const Login = () => {
               <AlertDescription>
                 <p className="text-sm font-medium mb-2">Demo Akun:</p>
                 <ul className="text-xs space-y-1 text-muted-foreground">
-                  <li><strong>Admin:</strong> admin@empscaler.com (password apa saja)</li>
-                  <li><strong>Manager:</strong> budi@empscaler.com (password apa saja)</li>
-                  <li><strong>Karyawan:</strong> siti@empscaler.com (password apa saja)</li>
-                  <li><strong>Pimpinan:</strong> ahmad@empscaler.com (password apa saja)</li>
+                  <li><strong>Admin:</strong> admin@hrmetric.com (password apa saja)</li>
+                  <li><strong>Manager:</strong> budi@hrmetric.com (password apa saja)</li>
+                  <li><strong>Karyawan:</strong> siti@hrmetric.com (password apa saja)</li>
+                  <li><strong>Pimpinan:</strong> ahmad@hrmetric.com (password apa saja)</li>
                 </ul>
               </AlertDescription>
             </Alert>

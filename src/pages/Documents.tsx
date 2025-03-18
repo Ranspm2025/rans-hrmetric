@@ -12,7 +12,7 @@ import DocumentFilters from '@/components/DocumentFilters';
 
 const Documents = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const { isAuthenticated, isKaryawan, isManager, isAdmin, isPemimpin, user } = useAuth();
 
   // Filter documents based on role and search term
@@ -30,16 +30,16 @@ const Documents = () => {
       employeeName.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Apply status filter
-    const matchesStatus = statusFilter ? doc.status === statusFilter : true;
+    const matchesStatus = statusFilter === 'all' ? true : doc.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Navbar />
       
-      <div className="container mx-auto px-4 pt-32 pb-20">
+      <div className="container mx-auto px-4 pt-24 pb-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -77,7 +77,7 @@ const Documents = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-center py-12"
+            className="text-center py-12 bg-card rounded-lg shadow p-8"
           >
             <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground">Tidak ada dokumen yang ditemukan.</p>

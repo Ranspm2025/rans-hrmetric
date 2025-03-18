@@ -1,5 +1,5 @@
 
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { 
   Select,
@@ -16,9 +16,14 @@ interface DocumentFiltersProps {
   onStatusFilterChange: (value: string) => void;
 }
 
-const DocumentFilters = ({ searchTerm, onSearchChange, statusFilter, onStatusFilterChange }: DocumentFiltersProps) => {
+const DocumentFilters = ({
+  searchTerm,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange
+}: DocumentFiltersProps) => {
   return (
-    <div className="mb-8">
+    <div className="mb-8 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -31,13 +36,10 @@ const DocumentFilters = ({ searchTerm, onSearchChange, statusFilter, onStatusFil
         </div>
         <Select value={statusFilter} onValueChange={onStatusFilterChange}>
           <SelectTrigger className="w-[180px]">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <SelectValue placeholder="Filter Status" />
-            </div>
+            <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Semua Status</SelectItem>
+            <SelectItem value="all">Semua Status</SelectItem>
             <SelectItem value="pending">Menunggu Review</SelectItem>
             <SelectItem value="reviewed">Sudah Direview</SelectItem>
             <SelectItem value="approved">Disetujui</SelectItem>

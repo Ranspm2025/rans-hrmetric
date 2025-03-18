@@ -94,10 +94,10 @@ const Employees = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Navbar />
       
-      <div className="container mx-auto px-4 pt-32 pb-20">
+      <div className="container mx-auto px-4 pt-24 pb-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ const Employees = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-center py-12"
+            className="text-center py-12 bg-card rounded-lg shadow p-8"
           >
             <p className="text-muted-foreground">Tidak ada karyawan yang ditemukan.</p>
             <button onClick={resetFilters} className="mt-2 text-primary hover:underline">
