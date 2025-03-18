@@ -15,7 +15,6 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Documents from "./pages/Documents";
 import DocumentUpload from "./pages/DocumentUpload";
-import ManageEmployees from "./pages/ManageEmployees";
 import CriteriaPage from "./pages/CriteriaPage";
 import ManagerEvaluations from "./pages/ManagerEvaluations";
 
@@ -78,15 +77,6 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute requiredRoles={['karyawan']}>
               <DocumentUpload />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/manage-employees" 
-          element={
-            <ProtectedRoute requiredRoles={['admin', 'manager']}>
-              <ManageEmployees />
             </ProtectedRoute>
           } 
         />
