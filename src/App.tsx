@@ -17,104 +17,92 @@ import DocumentUpload from "./pages/DocumentUpload";
 import CriteriaPage from "./pages/CriteriaPage";
 import ManagerEvaluations from "./pages/ManagerEvaluations";
 
-// Konfigurasi QueryClient
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-// Komponen untuk Route yang Dilindungi
-const ProtectedRoute = ({
-  children,
-  requiredRoles = [],
-}: {
-  children: JSX.Element;
-  requiredRoles?: string[];
-}) => {
+// Protected route component
+const ProtectedRoute = ({ children, requiredRoles = [] }: { children: JSX.Element, requiredRoles?: string[] }) => {
   const { isAuthenticated, user } = useAuth();
-
-  if (!isAuthenticated) return <Navigate to="/login" />;
-
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
   if (requiredRoles.length > 0 && user && !requiredRoles.includes(user.role)) {
     return <Navigate to="/" />;
   }
-
+  
   return children;
 };
 
-// Komponen Routes
-const AppRoutes = () => (
-  <AnimatePresence mode="wait">
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/policies" element={<Policies />} />
-      <Route path="/policy/:id" element={<PolicyDetail />} />
+const AppRoutes = () => {
+  return (
+    <AnimatePresence mode="wait">
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/policies" element={<Policies />} />
+        <Route path="/policy/:id" element={<PolicyDetail />} />
+        
+        <Route 
+          path="/employees" 
+          element={
+            <ProtectedRoute>
+              <Employees />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/evaluation" 
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin', 'karyawan']}>
+              <Evaluation />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/manager-evaluations" 
+          element={
+            <ProtectedRoute requiredRoles={['pemimpin']}>
+              <ManagerEvaluations />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/documents" 
+          element={
+            <ProtectedRoute>
+              <Documents />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/upload-document" 
+          element={
+            <ProtectedRoute requiredRoles={['karyawan']}>
+              <DocumentUpload />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/criteria" 
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager']}>
+              <CriteriaPage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
-      <Route
-        path="/employees"
-        element={
-          <ProtectedRoute>
-            <Employees />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/evaluation"
-        element={
-          <ProtectedRoute requiredRoles={["admin", "manager", "pemimpin", "karyawan"]}>
-            <Evaluation />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/manager-evaluations"
-        element={
-          <ProtectedRoute requiredRoles={["pemimpin"]}>
-            <ManagerEvaluations />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/documents"
-        element={
-          <ProtectedRoute>
-            <Documents />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/upload-document"
-        element={
-          <ProtectedRoute requiredRoles={["karyawan"]}>
-            <DocumentUpload />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/criteria"
-        element={
-          <ProtectedRoute requiredRoles={["admin", "manager"]}>
-            <CriteriaPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </AnimatePresence>
-);
-
-// Komponen Utama
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
