@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface EvaluationFormProps {
   employeeId?: string;
@@ -27,6 +29,68 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const [formData, setFormData] = useState<Record<string, number>>({});
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isManager) {
+      toast({
+        title: "Akses Ditolak",
+        description: "Manager tidak perlu melakukan penilaian.",
+        variant: "destructive"
+      });
+      navigate('/');
+      return;
+    }
+  }, [isManager, navigate, toast]);
+
+  if (isManager) {
+    return null;
+  }
+
+  // For regular employees, show their evaluation results
+  if (isKaryawan && !isAdmin && !isPemimpin) {
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle>Hasil Penilaian</CardTitle>
+          <CardDescription>Hasil penilaian kinerja dan kepribadian Anda</CardDescription>
+          {employee && (
+            <div className="flex items-center gap-3 mt-4">
+              <Avatar className="h-10 w-10 border-2 border-primary/20">
+                <AvatarImage src={employee.avatar} alt={employee.name} />
+                <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium">{employee.name}</p>
+                <p className="text-xs text-muted-foreground">{employee.position}</p>
+              </div>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium mb-2">Skor Kinerja</h3>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Total Skor</span>
+                <span className="text-sm font-medium">{employee?.performance || 0}</span>
+              </div>
+              <Progress value={employee?.performance || 0} className="h-2" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium mb-2">Skor Kepribadian</h3>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Total Skor</span>
+                <span className="text-sm font-medium">{employee?.personality || 0}</span>
+              </div>
+              <Progress value={employee?.personality || 0} className="h-2" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const performanceCriteria = evaluationCriteria.filter(c => c.category === 'performance');
   const personalityCriteria = evaluationCriteria.filter(c => c.category === 'personality');

@@ -126,7 +126,58 @@ export const employees: Employee[] = [
     performance: 88,
     personality: 90,
   },
+  {
+    id: '3',
+    name: 'Rudi Hartono',
+    position: 'Senior Developer',
+    department: 'Teknologi',
+    avatar: 'https://i.pravatar.cc/150?img=12',
+    hireDate: '2022-03-20',
+    performance: 95,
+    personality: 85,
+  },
+  {
+    id: '4',
+    name: 'Maya Putri',
+    position: 'HR Specialist',
+    department: 'SDM',
+    avatar: 'https://i.pravatar.cc/150?img=20',
+    hireDate: '2021-08-15',
+    performance: 87,
+    personality: 93,
+  },
+  {
+    id: '5',
+    name: 'Dian Kusuma',
+    position: 'Content Manager',
+    department: 'Digital Marketing',
+    avatar: 'https://i.pravatar.cc/150?img=25',
+    hireDate: '2022-06-10',
+    performance: 89,
+    personality: 88,
+  },
+  {
+    id: '6',
+    name: 'Eko Prasetyo',
+    position: 'Supply Chain Analyst',
+    department: 'Operasional',
+    avatar: 'https://i.pravatar.cc/150?img=30',
+    hireDate: '2023-01-05',
+    performance: 86,
+    personality: 85,
+  },
+  {
+    id: '7',
+    name: 'Linda Wijaya',
+    position: 'Quality Assurance',
+    department: 'Produksi',
+    avatar: 'https://i.pravatar.cc/150?img=35',
+    hireDate: '2022-11-20',
+    performance: 91,
+    personality: 89,
+  },
 ];
+
 
 export const evaluationCriteria: EvaluationCriteria[] = [
   {
