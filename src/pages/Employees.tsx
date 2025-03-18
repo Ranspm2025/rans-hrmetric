@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -39,7 +40,7 @@ const Employees = () => {
       );
       
       if (userEmployee) {
-        navigate(/evaluation?employeeId=${userEmployee.id});
+        navigate(`/evaluation?employeeId=${userEmployee.id}`);
       } else {
         toast({
           title: "Profil tidak ditemukan",
@@ -56,7 +57,7 @@ const Employees = () => {
 
     // Handle evaluate parameter if present
     if (evaluateParam && (isAdmin || isManager || isPemimpin)) {
-      navigate(/evaluation?employeeId=${evaluateParam});
+      navigate(`/evaluation?employeeId=${evaluateParam}`);
     }
   }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
 
@@ -126,7 +127,7 @@ const Employees = () => {
   };
 
   const handleEvaluateEmployee = (id: string) => {
-    navigate(/evaluation?employeeId=${id});
+    navigate(`/evaluation?employeeId=${id}`);
   };
 
   const handlePromoteEmployee = (id: string) => {
@@ -134,7 +135,7 @@ const Employees = () => {
     if (employee) {
       toast({
         title: "Rekomendasi Promosi",
-        description: ${employee.name} telah direkomendasikan untuk promosi. Menunggu persetujuan dari pimpinan.,
+        description: `${employee.name} telah direkomendasikan untuk promosi. Menunggu persetujuan dari pimpinan.`,
       });
     }
   };
