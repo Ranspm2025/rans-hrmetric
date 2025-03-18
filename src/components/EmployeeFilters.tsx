@@ -1,4 +1,3 @@
-
 import { Search, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -39,6 +38,15 @@ const EmployeeFilters = ({
   viewMode,
   onViewModeChange
 }: EmployeeFiltersProps) => {
+  
+  const handleDepartmentFilterChange = (value: string) => {
+    if (value === "all") {
+      onDepartmentFilterChange("");
+    } else {
+      onDepartmentFilterChange(value);
+    }
+  };
+  
   return (
     <div className="mb-8 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row gap-4">
@@ -52,7 +60,7 @@ const EmployeeFilters = ({
           />
         </div>
         <div className="flex gap-3">
-          <Select value={departmentFilter} onValueChange={onDepartmentFilterChange}>
+          <Select value={departmentFilter || "all"} onValueChange={handleDepartmentFilterChange}>
             <SelectTrigger className="w-[180px]">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
@@ -60,7 +68,7 @@ const EmployeeFilters = ({
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Departemen</SelectItem>
+              <SelectItem value="all">Semua Departemen</SelectItem>
               {departments.map(department => (
                 <SelectItem key={department} value={department}>
                   {department}
