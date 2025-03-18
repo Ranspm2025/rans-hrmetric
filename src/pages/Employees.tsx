@@ -28,15 +28,55 @@ const Employees = () => {
 
   const departments = [...new Set(employees.map(employee => employee.department))];
 
-  // If regular user, redirect to their profile view
   useEffect(() => {
     const editParam = searchParams.get('edit');
     const evaluateParam = searchParams.get('evaluate');
 
-    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-      // Find employee with same email as user
+    // Handle evaluate parameter if present
+    if (evaluateParam) {
+      if (isAdmin || isManager || isPemimpin) {
+        navigate(`/evaluation?employeeId=${evaluateParam}`);
+        return;
+      } else if (isKaryawan && user) {
+        // For employees, only allow viewing their own evaluation
+        const userEmployee = employees.find(
+          emp => emp.name.toLowerCase() === user.name.toLowerCase()
+        );
+        
+        if (userEmployee && evaluateParam === userEmployee.id) {
+          navigate(`/evaluation?employeeId=${evaluateParam}`);
+          return;
+        }
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda hanya dapat melihat evaluasi diri sendiri",
+          variant: "destructive"
+        });
+        navigate('/');
+        return;
+      }
+    }
+
+    // Handle edit parameter if present
+    if (editParam) {
+      if (isAdmin || isManager) {
+        navigate(`/manage-employees?edit=${editParam}`);
+        return;
+      } else {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda tidak memiliki akses untuk mengedit data karyawan",
+          variant: "destructive"
+        });
+        navigate('/');
+        return;
+      }
+    }
+
+    // If regular user, show only their profile
+    if (isKaryawan && !isAdmin && !isManager && !isPemimpin && user) {
       const userEmployee = employees.find(
-        emp => emp.name.toLowerCase() === user?.name.toLowerCase()
+        emp => emp.name.toLowerCase() === user.name.toLowerCase()
       );
       
       if (userEmployee) {
@@ -47,17 +87,8 @@ const Employees = () => {
           description: "Profil karyawan Anda tidak ditemukan dalam sistem",
           variant: "destructive"
         });
+        navigate('/');
       }
-    }
-
-    // Handle edit parameter if present
-    if (editParam && (isAdmin || isManager)) {
-      // Implementation for editing will be added
-    }
-
-    // Handle evaluate parameter if present
-    if (evaluateParam && (isAdmin || isManager || isPemimpin)) {
-      navigate(`/evaluation?employeeId=${evaluateParam}`);
     }
   }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
 

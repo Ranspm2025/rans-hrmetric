@@ -23,7 +23,6 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children, requiredRoles = [] }: { children: JSX.Element, requiredRoles?: string[] }) => {
   const { isAuthenticated, user } = useAuth();
 
-  // **Perbaikan**: Tampilkan loading jika `isAuthenticated` masih `undefined`
   if (isAuthenticated === undefined) {
     return <div className="flex items-center justify-center min-h-screen text-lg font-semibold">Loading...</div>;
   }
@@ -32,7 +31,6 @@ const ProtectedRoute = ({ children, requiredRoles = [] }: { children: JSX.Elemen
     return <Navigate to="/login" />;
   }
 
-  // **Perbaikan**: Pastikan `user` ada sebelum mengecek `role`
   if (requiredRoles.length > 0 && (!user || !user.role || !requiredRoles.includes(user.role))) {
     return <Navigate to="/" />;
   }
@@ -46,9 +44,22 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/policies" element={<Policies />} />
-        <Route path="/policy/:id" element={<PolicyDetail />} />
-
+        <Route 
+          path="/policies" 
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin']}>
+              <Policies />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/policy/:id" 
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin']}>
+              <PolicyDetail />
+            </ProtectedRoute>
+          } 
+        />
         <Route 
           path="/employees" 
           element={
@@ -57,7 +68,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
-
         <Route 
           path="/evaluation" 
           element={
@@ -66,7 +76,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
-
         <Route 
           path="/manager-evaluations" 
           element={
@@ -75,16 +84,14 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
-
         <Route 
           path="/documents" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin', 'karyawan']}>
               <Documents />
             </ProtectedRoute>
           } 
         />
-
         <Route 
           path="/upload-document" 
           element={
@@ -93,7 +100,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
-
         <Route 
           path="/criteria" 
           element={
@@ -102,7 +108,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } 
         />
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
