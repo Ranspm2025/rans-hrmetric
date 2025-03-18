@@ -66,7 +66,7 @@ const Documents = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="container mx-auto px-4 pt-32 pb-20">

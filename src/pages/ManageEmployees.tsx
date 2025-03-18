@@ -103,7 +103,7 @@ const ManageEmployees = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="container mx-auto px-4 pt-32 pb-20">
@@ -236,7 +236,7 @@ const ManageEmployees = () => {
             <p className="text-muted-foreground">Tidak ada karyawan yang ditemukan.</p>
           </motion.div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-card rounded-lg shadow overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
