@@ -158,12 +158,9 @@ const Employees = () => {
   };
 
   const handleEvaluateEmployee = (id: string) => {
-    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-      toast({
-        title: "Akses Ditolak",
-        description: "Karyawan reguler tidak diperkenankan melakukan penilaian.",
-        variant: "destructive"
-      });
+    if (!isManager) {
+      // Only managers can evaluate employees
+      navigate(`/evaluation?employeeId=${id}&view=true`);
       return;
     }
     navigate(`/evaluation?employeeId=${id}`);

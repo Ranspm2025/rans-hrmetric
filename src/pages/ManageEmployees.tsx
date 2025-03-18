@@ -41,7 +41,40 @@ const ManageEmployees = () => {
   });
   const { toast } = useToast();
 
-  const departments = [...new Set(employees.map(employee => employee.department))];
+  const [departments, setDepartments] = useState([...new Set(employees.map(employee => employee.department))]);
+
+  const handleDeleteDepartment = (departmentToDelete: string) => {
+    const employeesInDepartment = employees.filter(emp => emp.department === departmentToDelete);
+    if (employeesInDepartment.length > 0) {
+      toast({
+        title: "Tidak dapat menghapus departemen",
+        description: "Pindahkan semua karyawan ke departemen lain terlebih dahulu.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setDepartments(prev => prev.filter(dept => dept !== departmentToDelete));
+    toast({
+      title: "Departemen Dihapus",
+      description: `Departemen ${departmentToDelete} telah dihapus."
+    });
+  };
+
+  const handleAddNewDepartment = (newDepartment: string) => {
+    if (departments.includes(newDepartment)) {
+      toast({
+        title: "Departemen sudah ada",
+        description: "Silakan gunakan nama departemen yang berbeda.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setDepartments(prev => [...prev, newDepartment]);
+    toast({
+      title: "Departemen Ditambahkan",
+      description: `Departemen ${newDepartment} telah ditambahkan.",
+    });
+  };
 
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -155,21 +188,34 @@ const ManageEmployees = () => {
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="department">Departemen</Label>
-                    <Select value={newEmployee.department} onValueChange={handleSelectChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih departemen" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((department) => (
-                          <SelectItem key={department} value={department}>
-                            {department}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="Departemen Baru">Departemen Baru</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="department">Departemen</Label>
+                      <Select value={newEmployee.department} onValueChange={handleSelectChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih departemen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">+ Tambah Departemen Baru</SelectItem>
+                          {departments.map((department) => (
+                            <SelectItem key={department} value={department}>
+                              {department}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {newEmployee.department === 'new' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="newDepartment">Nama Departemen Baru</Label>
+                        <Input
+                          id="newDepartment"
+                          placeholder="Masukkan nama departemen"
+                          onChange={(e) => handleAddNewDepartment(e.target.value)}
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   {newEmployee.department === 'Departemen Baru' && (
@@ -195,7 +241,7 @@ const ManageEmployees = () => {
           </Dialog>
         </motion.div>
         
-        <div className="mb-8">
+        <div className="mb-8 space-y-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -223,6 +269,33 @@ const ManageEmployees = () => {
               </SelectContent>
             </Select>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Kelola Departemen</CardTitle>
+              <CardDescription>Tambah atau hapus departemen</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {departments.map((department) => (
+                  <div key={department} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4 text-muted-foreground" />
+                      <span>{department}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleDeleteDepartment(department)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
         
         {filteredEmployees.length === 0 ? (

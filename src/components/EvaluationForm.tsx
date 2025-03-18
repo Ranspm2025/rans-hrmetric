@@ -32,24 +32,22 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isManager) {
-      toast({
-        title: "Akses Ditolak",
-        description: "Manager tidak perlu melakukan penilaian.",
-        variant: "destructive"
-      });
-      navigate('/');
-      return;
-    }
-  }, [isManager, navigate, toast]);
+  const searchParams = new URLSearchParams(window.location.search);
+  const viewOnly = searchParams.get('view') === 'true';
 
-  if (isManager) {
-    return null;
+  // Only managers can perform evaluations
+  if (!isManager && !viewOnly) {
+    toast({
+      title: "Akses Ditolak",
+      description: "Hanya manager yang dapat melakukan penilaian.",
+      variant: "destructive"
+    });
+    navigate('/');
+    return;
   }
 
-  // For regular employees, show their evaluation results
-  if (isKaryawan && !isAdmin && !isPemimpin) {
+  // Show evaluation results for non-managers
+  if (!isManager || viewOnly) {
     return (
       <Card className="overflow-hidden">
         <CardHeader>
