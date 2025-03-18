@@ -1,13 +1,15 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import EmployeeCard from '@/components/EmployeeCard';
 import EmployeeList from '@/components/EmployeeList';
 import EmployeeFilters from '@/components/EmployeeFilters';
 import AddEmployeeDialog from '@/components/AddEmployeeDialog';
-import { employees, getPromotionScore } from '@/lib/data';
+import { employees, getPromotionScore, getEmployeeById } from '@/lib/data';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 type SortField = 'name' | 'performance' | 'personality' | 'promotionScore';
 type SortOrder = 'asc' | 'desc';
@@ -19,11 +21,52 @@ const Employees = () => {
   const [sortField, setSortField] = useState<SortField>('promotionScore');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [viewMode, setViewMode] = useState<ViewMode>('card');
-  const { isAdmin, isManager } = useAuth();
+  const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const departments = [...new Set(employees.map(employee => employee.department))];
 
+  // If regular user, redirect to their profile view
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    const evaluateParam = searchParams.get('evaluate');
+
+    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
+      // Find employee with same email as user
+      const userEmployee = employees.find(
+        emp => emp.name.toLowerCase() === user?.name.toLowerCase()
+      );
+      
+      if (userEmployee) {
+        navigate(`/evaluation?employeeId=${userEmployee.id}`);
+      } else {
+        toast({
+          title: "Profil tidak ditemukan",
+          description: "Profil karyawan Anda tidak ditemukan dalam sistem",
+          variant: "destructive"
+        });
+      }
+    }
+
+    // Handle edit parameter if present
+    if (editParam && (isAdmin || isManager)) {
+      // Implementation for editing will be added
+    }
+
+    // Handle evaluate parameter if present
+    if (evaluateParam && (isAdmin || isManager || isPemimpin)) {
+      navigate(`/evaluation?employeeId=${evaluateParam}`);
+    }
+  }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
+
   const filteredEmployees = employees.filter(employee => {
+    // Regular users should only see their own profile
+    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
+      return user && employee.name.toLowerCase() === user.name.toLowerCase();
+    }
+
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
@@ -83,6 +126,20 @@ const Employees = () => {
     console.log("Refreshing employee list");
   };
 
+  const handleEvaluateEmployee = (id: string) => {
+    navigate(`/evaluation?employeeId=${id}`);
+  };
+
+  const handlePromoteEmployee = (id: string) => {
+    const employee = getEmployeeById(id);
+    if (employee) {
+      toast({
+        title: "Rekomendasi Promosi",
+        description: `${employee.name} telah direkomendasikan untuk promosi. Menunggu persetujuan dari pimpinan.`,
+      });
+    }
+  };
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -92,6 +149,26 @@ const Employees = () => {
       }
     }
   };
+
+  // If user is a basic employee, we'll redirect them in the useEffect
+  if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-24 pb-20">
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center h-64"
+          >
+            <div className="text-center">
+              <h2 className="text-xl font-medium">Mengalihkan ke halaman profil...</h2>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
@@ -107,7 +184,11 @@ const Employees = () => {
           <div>
             <h1 className="text-3xl font-bold">Karyawan</h1>
             <p className="text-muted-foreground">
-              Lihat daftar karyawan dan profil penilaian kinerja dan kepribadian mereka
+              {isPemimpin 
+                ? "Pantau dan setujui rekomendasi promosi karyawan"
+                : isAdmin || isManager 
+                ? "Kelola dan nilai karyawan berdasarkan kinerja dan kepribadian" 
+                : "Lihat daftar karyawan dan profil penilaian"}
             </p>
           </div>
           
@@ -154,11 +235,21 @@ const Employees = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {sortedEmployees.map((employee, index) => (
-              <EmployeeCard key={employee.id} employee={employee} index={index} />
+              <EmployeeCard 
+                key={employee.id} 
+                employee={employee} 
+                index={index} 
+                onEvaluate={handleEvaluateEmployee}
+                onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+              />
             ))}
           </motion.div>
         ) : (
-          <EmployeeList employees={sortedEmployees} />
+          <EmployeeList 
+            employees={sortedEmployees} 
+            onEvaluate={handleEvaluateEmployee}
+            onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+          />
         )}
       </div>
     </div>

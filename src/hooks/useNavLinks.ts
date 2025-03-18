@@ -11,6 +11,7 @@ export const useNavLinks = () => {
     ];
     
     if (isAuthenticated) {
+      // All authenticated users can see Employees link
       links.push({ path: '/employees', label: 'Karyawan' });
       
       if (isKaryawan) {

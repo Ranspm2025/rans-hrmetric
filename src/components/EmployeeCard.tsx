@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { Calendar, Star, User, Edit, Trash, Eye } from 'lucide-react';
+import { Calendar, Star, User, Edit, Trash, Eye, Award } from 'lucide-react';
 import { Employee, getPromotionScore } from '@/lib/data';
 import { 
   Card, 
@@ -31,13 +31,15 @@ import { useAuth } from '@/contexts/AuthContext';
 interface EmployeeCardProps {
   employee: Employee;
   index: number;
+  onEvaluate?: (id: string) => void;
+  onPromote?: (id: string) => void;
 }
 
-const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
+const EmployeeCard = ({ employee, index, onEvaluate, onPromote }: EmployeeCardProps) => {
   const promotionScore = getPromotionScore(employee);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
-  const { isAdmin, isManager } = useAuth();
+  const { isAdmin, isManager, isPemimpin } = useAuth();
   
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-500';
@@ -60,6 +62,18 @@ const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
       description: `${employee.name} telah dihapus dari sistem`,
     });
     setShowDeleteDialog(false);
+  };
+
+  const handleEvaluate = () => {
+    if (onEvaluate) {
+      onEvaluate(employee.id);
+    }
+  };
+
+  const handlePromote = () => {
+    if (onPromote) {
+      onPromote(employee.id);
+    }
   };
 
   return (
@@ -116,29 +130,58 @@ const EmployeeCard = ({ employee, index }: EmployeeCardProps) => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="border-t bg-muted/20 px-3 py-2 grid grid-cols-3 gap-1">
-          <Button variant="ghost" size="sm" className="text-xs" asChild>
-            <Link to={`/evaluation?employeeId=${employee.id}`}>
-              <Eye className="h-3.5 w-3.5 mr-1" />
-              Detail
-            </Link>
+        <CardFooter className="border-t bg-muted/20 px-3 py-2 flex flex-wrap gap-1 justify-between">
+          <Button variant="ghost" size="sm" className="text-xs h-8" onClick={handleEvaluate}>
+            <Eye className="h-3.5 w-3.5 mr-1" />
+            {(isManager || isAdmin) ? "Nilai" : "Detail"}
           </Button>
           
           {(isAdmin || isManager) && (
             <>
-              <Button variant="ghost" size="sm" className="text-xs" asChild>
-                <Link to={`/manage-employees?edit=${employee.id}`}>
+              <Button variant="ghost" size="sm" className="text-xs h-8" asChild>
+                <Link to={`/employees?edit=${employee.id}`}>
                   <Edit className="h-3.5 w-3.5 mr-1" />
                   Edit
                 </Link>
               </Button>
               
-              <Button variant="ghost" size="sm" className="text-xs text-destructive" 
-                onClick={() => setShowDeleteDialog(true)}>
+              {!isPemimpin && promotionScore >= 85 && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-green-600 h-8" 
+                  onClick={handlePromote}
+                >
+                  <Award className="h-3.5 w-3.5 mr-1" />
+                  Promosikan
+                </Button>
+              )}
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs text-destructive h-8" 
+                onClick={() => setShowDeleteDialog(true)}
+              >
                 <Trash className="h-3.5 w-3.5 mr-1" />
                 Hapus
               </Button>
             </>
+          )}
+          
+          {isPemimpin && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs text-green-600 h-8" 
+              onClick={() => toast({
+                title: "Persetujuan",
+                description: `Promosi ${employee.name} telah disetujui.`,
+              })}
+            >
+              <Award className="h-3.5 w-3.5 mr-1" />
+              Setujui Promosi
+            </Button>
           )}
         </CardFooter>
       </Card>

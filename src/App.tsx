@@ -43,12 +43,20 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/policies" element={<Policies />} />
         <Route path="/policy/:id" element={<PolicyDetail />} />
-        <Route path="/employees" element={<Employees />} />
+        
+        <Route 
+          path="/employees" 
+          element={
+            <ProtectedRoute>
+              <Employees />
+            </ProtectedRoute>
+          } 
+        />
         
         <Route 
           path="/evaluation" 
           element={
-            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin']}>
+            <ProtectedRoute requiredRoles={['admin', 'manager', 'pemimpin', 'karyawan']}>
               <Evaluation />
             </ProtectedRoute>
           } 
