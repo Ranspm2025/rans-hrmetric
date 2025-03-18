@@ -1,32 +1,14 @@
-
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { User, PenLine, Trash, Building, Eye, Award } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { getPromotionScore } from '@/lib/data';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import { User, PenLine, Trash, Building, Eye, Award } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { getPromotionScore } from "@/lib/data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface EmployeeListProps {
   employees: Array<{
@@ -48,40 +30,30 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
   const { toast } = useToast();
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
-  const handleEvaluate = (id: string) => {
-    if (onEvaluate) {
-      onEvaluate(id);
-    }
-  };
+  const handleEvaluate = useCallback((id: string) => {
+    onEvaluate?.(id);
+  }, [onEvaluate]);
 
-  const handlePromote = (id: string) => {
-    if (onPromote) {
-      onPromote(id);
-    }
-  };
+  const handlePromote = useCallback((id: string) => {
+    onPromote?.(id);
+  }, [onPromote]);
 
-  const handleEditEmployee = (id: string) => {
-    toast({
-      title: "Edit Karyawan",
-      description: "Fitur edit karyawan akan segera tersedia",
-    });
-  };
+  const handleEditEmployee = useCallback((id: string) => {
+    toast({ title: "Edit Karyawan", description: "Fitur edit karyawan akan segera tersedia" });
+  }, [toast]);
 
-  const handleDeleteEmployee = () => {
+  const handleDeleteEmployee = useCallback(() => {
     if (employeeToDelete) {
-      toast({
-        title: "Hapus Karyawan",
-        description: "Karyawan berhasil dihapus dari sistem",
-      });
+      toast({ title: "Hapus Karyawan", description: "Karyawan berhasil dihapus dari sistem" });
       setEmployeeToDelete(null);
     }
-  };
+  }, [employeeToDelete, toast]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500';
-    if (score >= 80) return 'text-blue-500';
-    if (score >= 70) return 'text-yellow-500';
-    return 'text-red-500';
+    if (score >= 90) return "text-green-500";
+    if (score >= 80) return "text-blue-500";
+    if (score >= 70) return "text-yellow-500";
+    return "text-red-500";
   };
 
   return (
@@ -113,7 +85,7 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
               {employees.map((employee) => {
                 const promotionScore = getPromotionScore(employee);
                 const isPromotable = promotionScore >= 85;
-                
+
                 return (
                   <TableRow key={employee.id}>
                     <TableCell>
@@ -140,55 +112,36 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEvaluate(employee.id)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleEvaluate(employee.id)}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        
+
                         {(isAdmin || isManager) && (
                           <>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleEditEmployee(employee.id)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => handleEditEmployee(employee.id)}>
                               <PenLine className="h-4 w-4" />
                             </Button>
-                            
+
                             {isPromotable && !isPemimpin && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                className="text-green-600"
-                                onClick={() => handlePromote(employee.id)}
-                              >
+                              <Button variant="outline" size="sm" className="text-green-600" onClick={() => handlePromote(employee.id)}>
                                 <Award className="h-4 w-4" />
                               </Button>
                             )}
-                            
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="text-destructive"
-                              onClick={() => setEmployeeToDelete(employee.id)}
-                            >
+
+                            <Button variant="outline" size="sm" className="text-destructive" onClick={() => setEmployeeToDelete(employee.id)}>
                               <Trash className="h-4 w-4" />
                             </Button>
                           </>
                         )}
-                        
+
                         {isPemimpin && isPromotable && (
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             className="text-green-600"
-                            onClick={() => toast({
-                              title: "Persetujuan",
-                              description: `Promosi ${employee.name} telah disetujui.`,
-                            })}
+                            onClick={() =>
+                              toast({ title: "Persetujuan", description: `Promosi ${employee.name} telah disetujui.` })
+                            }
                           >
                             <Award className="h-4 w-4" />
                           </Button>
@@ -202,11 +155,8 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
           </Table>
         </div>
       )}
-      
-      <AlertDialog 
-        open={!!employeeToDelete} 
-        onOpenChange={(isOpen) => !isOpen && setEmployeeToDelete(null)}
-      >
+
+      <AlertDialog open={!!employeeToDelete} onOpenChange={(isOpen) => !isOpen && setEmployeeToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Karyawan</AlertDialogTitle>
@@ -216,10 +166,7 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDeleteEmployee} 
-              className="bg-destructive text-destructive-foreground"
-            >
+            <AlertDialogAction onClick={handleDeleteEmployee} className="bg-destructive text-destructive-foreground">
               Hapus
             </AlertDialogAction>
           </AlertDialogFooter>
