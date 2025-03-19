@@ -58,12 +58,21 @@ const ManageEmployees = () => {
     setDepartments(prev => prev.filter(dept => dept !== departmentToDelete));
     toast({
       title: "Departemen Dihapus",
-      description: `Departemen ${departmentToDelete} telah dihapus."
+      description: `Departemen ${departmentToDelete} telah dihapus.`
     });
   };
 
   const handleAddNewDepartment = (newDepartment: string) => {
-    if (departments.includes(newDepartment)) {
+    const trimmedDepartment = newDepartment.trim();
+    if (!trimmedDepartment) {
+      toast({
+        title: "Nama Departemen Kosong",
+        description: "Silakan masukkan nama departemen.",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (departments.includes(trimmedDepartment)) {
       toast({
         title: "Departemen sudah ada",
         description: "Silakan gunakan nama departemen yang berbeda.",
@@ -71,10 +80,11 @@ const ManageEmployees = () => {
       });
       return;
     }
-    setDepartments(prev => [...prev, newDepartment]);
+    setDepartments(prev => [...prev, trimmedDepartment]);
+    setNewDepartmentName('');
     toast({
       title: "Departemen Ditambahkan",
-      description: `Departemen ${newDepartment} telah ditambahkan.",
+      description: `Departemen ${trimmedDepartment} telah ditambahkan.`
     });
   };
 
@@ -214,23 +224,20 @@ const ManageEmployees = () => {
                         <Input
                           id="newDepartment"
                           placeholder="Masukkan nama departemen"
-                          onChange={(e) => handleAddNewDepartment(e.target.value)}
+                          value={newDepartmentName}
+                          onChange={(e) => {
+                            setNewDepartmentName(e.target.value);
+                            if (e.target.value.trim()) {
+                              setNewEmployee(prev => ({ ...prev, department: e.target.value.trim() }));
+                            }
+                          }}
+                          required
                         />
                       </div>
                     )}
                   </div>
                   
-                  {newEmployee.department === 'Departemen Baru' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="customDepartment">Nama Departemen Baru</Label>
-                      <Input
-                        id="customDepartment"
-                        onChange={(e) => setNewEmployee(prev => ({ ...prev, department: e.target.value }))}
-                        placeholder="Masukkan nama departemen"
-                        required
-                      />
-                    </div>
-                  )}
+
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
