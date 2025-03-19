@@ -1,7 +1,30 @@
 
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { User, getCurrentUser, setCurrentUser, getUserByEmailAndPassword } from '@/lib/data';
+import { users } from '@/lib/data';
+import { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+
+// Current user storage in localStorage
+const getCurrentUser = (): User | null => {
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    return JSON.parse(storedUser);
+  }
+  return null;
+};
+
+const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('currentUser');
+  }
+};
+
+const getUserByEmailAndPassword = (email: string, password: string): User | null => {
+  const user = users.find(u => u.email === email && u.password === password);
+  return user || null;
+};
 
 interface AuthContextType {
   user: User | null;

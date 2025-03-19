@@ -1,11 +1,11 @@
 
 import { motion } from 'framer-motion';
-import { Policy } from '@/lib/data';
 import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Policy } from '@/types';
 
 interface PolicyCardProps {
   policy: Policy;

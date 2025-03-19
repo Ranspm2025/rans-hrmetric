@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
-import { getPolicyById, Policy } from '@/lib/data';
+import { getPolicyById } from '@/lib/data';
+import { Policy } from '@/types';
 
 const PolicyDetail = () => {
   const { id } = useParams<{ id: string }>();

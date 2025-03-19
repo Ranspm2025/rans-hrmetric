@@ -1,5 +1,4 @@
-
-import type { User, Employee, EvaluationCriteria, Department, Policy } from '@/types';
+import type { User, Employee, EvaluationCriteria, Department, Policy, Evaluation, Document, PerformanceData } from '@/types';
 
 // User accounts for the login system
 export const users: User[] = [
@@ -260,6 +259,100 @@ export const departments: Department[] = [
   },
 ];
 
+// Evaluations data
+export const evaluations: Evaluation[] = [
+  {
+    id: '1',
+    employeeId: '1',
+    managerId: '2',
+    date: '2023-10-15',
+    status: 'pending',
+    criteriaScores: [
+      { criteriaId: '1', score: 85 },
+      { criteriaId: '2', score: 90 },
+      { criteriaId: '3', score: 80 },
+      { criteriaId: '4', score: 95 },
+    ],
+    overallComment: 'Karyawan menunjukkan kinerja yang baik dalam proyek-proyek yang ditangani.'
+  },
+  {
+    id: '2',
+    employeeId: '2',
+    managerId: '2',
+    date: '2023-11-20',
+    status: 'pending',
+    criteriaScores: [
+      { criteriaId: '1', score: 75 },
+      { criteriaId: '2', score: 80 },
+      { criteriaId: '3', score: 85 },
+      { criteriaId: '4', score: 70 },
+    ],
+    overallComment: 'Perlu meningkatkan keterampilan komunikasi dan kolaborasi dalam tim.'
+  },
+  {
+    id: '3',
+    employeeId: '3',
+    managerId: '2',
+    date: '2023-12-05',
+    status: 'approved',
+    criteriaScores: [
+      { criteriaId: '1', score: 95 },
+      { criteriaId: '2', score: 90 },
+      { criteriaId: '3', score: 85 },
+      { criteriaId: '4', score: 90 },
+    ],
+    overallComment: 'Karyawan menunjukkan dedikasi dan inovasi yang tinggi dalam pekerjaannya.',
+    approvedBy: '4',
+    approvedDate: '2023-12-10'
+  }
+];
+
+// Documents data
+export const documents: Document[] = [
+  {
+    id: '1',
+    title: 'Laporan Kinerja Q1 2023',
+    description: 'Laporan kinerja departemen untuk kuartal pertama 2023',
+    fileName: 'laporan_q1_2023.pdf',
+    fileType: 'application/pdf',
+    uploadDate: '2023-04-10',
+    uploadedBy: '1',
+    category: 'Laporan',
+    status: 'approved'
+  },
+  {
+    id: '2',
+    title: 'Dokumen Pelatihan Karyawan',
+    description: 'Materi pelatihan untuk karyawan baru',
+    fileName: 'materi_pelatihan.pptx',
+    fileType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    uploadDate: '2023-06-15',
+    uploadedBy: '3',
+    category: 'Pelatihan',
+    status: 'pending'
+  },
+  {
+    id: '3',
+    title: 'SOP Departemen HR',
+    description: 'Standard Operating Procedure untuk departemen HR',
+    fileName: 'sop_hr.docx',
+    fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    uploadDate: '2023-07-22',
+    uploadedBy: '2',
+    category: 'SOP',
+    status: 'approved'
+  }
+];
+
+// Performance data for charts
+export const performanceData: PerformanceData[] = [
+  { name: 'Engineering', performanceAvg: 88, personalityAvg: 85, count: 10 },
+  { name: 'HR', performanceAvg: 92, personalityAvg: 88, count: 5 },
+  { name: 'Marketing', performanceAvg: 86, personalityAvg: 90, count: 8 },
+  { name: 'Finance', performanceAvg: 89, personalityAvg: 84, count: 6 },
+  { name: 'Product', performanceAvg: 91, personalityAvg: 87, count: 9 }
+];
+
 // Helper functions
 export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
@@ -297,4 +390,76 @@ export const deleteEmployee = (id: string): boolean => {
   const initialLength = employeesData.length;
   employeesData = employeesData.filter(emp => emp.id !== id);
   return employeesData.length < initialLength;
+};
+
+// Policy functions
+export const getPolicyById = (id: string): Policy | undefined => {
+  return policies.find(policy => policy.id === id);
+};
+
+// User authentication functions
+let currentUser: User | null = null;
+
+export const getCurrentUser = (): User | null => {
+  return currentUser;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  currentUser = user;
+};
+
+export const getUserByEmailAndPassword = (email: string, password: string): User | null => {
+  const user = users.find(u => u.email === email && u.password === password);
+  return user || null;
+};
+
+// Evaluation functions
+export const getEvaluationsPendingApproval = (): Evaluation[] => {
+  return evaluations.filter(eval => eval.status === 'pending');
+};
+
+export const approveEvaluation = (evaluationId: string, approverId: string): Evaluation | null => {
+  const index = evaluations.findIndex(eval => eval.id === evaluationId);
+  if (index === -1) return null;
+  
+  evaluations[index] = {
+    ...evaluations[index],
+    status: 'approved',
+    approvedBy: approverId,
+    approvedDate: new Date().toISOString().split('T')[0]
+  };
+  
+  return evaluations[index];
+};
+
+// Criteria management
+export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
+  const newId = (evaluationCriteria.length + 1).toString();
+  const newCriteria: EvaluationCriteria = {
+    id: newId,
+    ...criteria
+  };
+  
+  evaluationCriteria.push(newCriteria);
+  return newCriteria;
+};
+
+// Document management
+export const addDocument = (document: Omit<Document, 'id'>): Document => {
+  const newId = (documents.length + 1).toString();
+  const newDocument: Document = {
+    id: newId,
+    ...document
+  };
+  
+  documents.push(newDocument);
+  return newDocument;
+};
+
+// Get promotion candidates
+export const getPromotionCandidates = (): Employee[] => {
+  return employeesData.filter(emp => {
+    const score = getPromotionScore(emp);
+    return score >= 85; // Threshold for promotion eligibility
+  });
 };
