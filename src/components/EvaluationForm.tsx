@@ -28,6 +28,7 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const [selectedTab, setSelectedTab] = useState('performance');
   const [formData, setFormData] = useState<Record<string, number>>({});
   const [progress, setProgress] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
   const navigate = useNavigate();
@@ -36,19 +37,23 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const viewOnly = searchParams.get('view') === 'true';
 
   useEffect(() => {
-    // Only managers can perform evaluations
-    if (!isManager && !viewOnly) {
+    // Only managers and admins can perform evaluations
+    if (!isManager && !isAdmin && !viewOnly) {
       toast({
         title: "Akses Ditolak",
-        description: "Hanya manager yang dapat melakukan penilaian.",
+        description: "Hanya manager dan admin yang dapat melakukan penilaian.",
         variant: "destructive"
       });
       navigate('/');
     }
-  }, [isManager, viewOnly, toast, navigate]);
+  }, [isManager, isAdmin, viewOnly, toast, navigate]);
 
-  // Show evaluation results for non-managers
-  if (!isManager || viewOnly) {
+  const handleBack = () => {
+    navigate('/employees');
+  };
+
+  // Show evaluation results for non-managers/non-admins
+  if ((!isManager && !isAdmin) || viewOnly) {
     return (
       <Card className="overflow-hidden">
         <CardHeader>
@@ -155,6 +160,17 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Kembali
+        </Button>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
