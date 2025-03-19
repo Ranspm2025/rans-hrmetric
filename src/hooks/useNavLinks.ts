@@ -26,8 +26,6 @@ export const useNavLinks = () => {
         links.push({ path: '/evaluation', label: 'Penilaian' });
       } else if (isManager) {
         links.push({ path: '/evaluation', label: 'Penilaian' });
-      } else if (isKaryawan) {
-        links.push({ path: '/evaluation', label: 'Evaluasi' });
       }
       
       if (isPemimpin) {

@@ -153,6 +153,7 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
                           onClick={() => handleEvaluate(employee.id)}
                         >
                           <Eye className="h-4 w-4" />
+                          <span className="ml-2">{isManager ? 'Nilai' : 'Lihat'}</span>
                         </Button>
                         
                         {(isAdmin || isManager) && (
