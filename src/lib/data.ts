@@ -7,7 +7,7 @@ export const users: User[] = [
     id: '1',
     name: 'Admin',
     email: 'admin@hrmetric.com',
-    password: 'admin123',
+    password: 'admin123', // Already matches what's shown on login page
     role: 'admin',
     avatar: 'https://i.pravatar.cc/150?img=68',
   },
@@ -15,7 +15,7 @@ export const users: User[] = [
     id: '2',
     name: 'Budi',
     email: 'budi@hrmetric.com',
-    password: 'password',
+    password: 'password', // Already updated to match login page
     role: 'manager',
     avatar: 'https://i.pravatar.cc/150?img=32',
   },
@@ -23,7 +23,7 @@ export const users: User[] = [
     id: '3',
     name: 'Siti',
     email: 'siti@hrmetric.com',
-    password: 'password',
+    password: 'password', // Already updated to match login page
     role: 'karyawan',
     avatar: 'https://i.pravatar.cc/150?img=16',
   },
@@ -31,7 +31,7 @@ export const users: User[] = [
     id: '4',
     name: 'Ahmad',
     email: 'ahmad@hrmetric.com',
-    password: 'password',
+    password: 'password', // Already updated to match login page
     role: 'pemimpin',
     avatar: 'https://i.pravatar.cc/150?img=2',
   },
