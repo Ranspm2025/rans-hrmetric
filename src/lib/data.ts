@@ -1,5 +1,4 @@
-
-import type { User, Employee, EvaluationCriteria, Department, Policy, Evaluation, Document, PerformanceData } from '@/types';
+import type { User, Employee, EvaluationCriteria, Department, Policy, Evaluation, Document, PerformanceData, CriteriaScore } from '@/types';
 
 // User accounts for the login system
 export const users: User[] = [
@@ -119,7 +118,8 @@ export const policies: Policy[] = [
   },
 ];
 
-export const employees: Employee[] = [
+// Initial employee data
+const initialEmployees: Employee[] = [
   {
     id: '1',
     name: 'Budi Santoso',
@@ -170,6 +170,82 @@ export const employees: Employee[] = [
     performance: 93,
     personality: 89,
   },
+];
+
+// Create mutable data structures for runtime changes
+let employeesData: Employee[] = [...initialEmployees];
+let departmentsData: Department[] = [
+  {
+    id: '1',
+    name: 'Engineering',
+    description: 'Departemen pengembangan perangkat lunak dan infrastruktur IT',
+  },
+  {
+    id: '2',
+    name: 'Human Resources',
+    description: 'Departemen pengelolaan sumber daya manusia',
+  },
+  {
+    id: '3',
+    name: 'Marketing',
+    description: 'Departemen pemasaran dan promosi produk',
+  },
+  {
+    id: '4',
+    name: 'Finance',
+    description: 'Departemen keuangan dan akuntansi',
+  },
+  {
+    id: '5',
+    name: 'Product',
+    description: 'Departemen pengembangan dan manajemen produk',
+  },
+];
+let evaluationsData: Evaluation[] = [
+  {
+    id: '1',
+    employeeId: '1',
+    managerId: '2',
+    date: '2023-10-15',
+    status: 'pending',
+    criteriaScores: [
+      { criteriaId: '1', score: 85 },
+      { criteriaId: '2', score: 90 },
+      { criteriaId: '3', score: 80 },
+      { criteriaId: '4', score: 95 },
+    ],
+    overallComment: 'Karyawan menunjukkan kinerja yang baik dalam proyek-proyek yang ditangani.'
+  },
+  {
+    id: '2',
+    employeeId: '2',
+    managerId: '2',
+    date: '2023-11-20',
+    status: 'pending',
+    criteriaScores: [
+      { criteriaId: '1', score: 75 },
+      { criteriaId: '2', score: 80 },
+      { criteriaId: '3', score: 85 },
+      { criteriaId: '4', score: 70 },
+    ],
+    overallComment: 'Perlu meningkatkan keterampilan komunikasi dan kolaborasi dalam tim.'
+  },
+  {
+    id: '3',
+    employeeId: '3',
+    managerId: '2',
+    date: '2023-12-05',
+    status: 'approved',
+    criteriaScores: [
+      { criteriaId: '1', score: 95 },
+      { criteriaId: '2', score: 90 },
+      { criteriaId: '3', score: 85 },
+      { criteriaId: '4', score: 90 },
+    ],
+    overallComment: 'Karyawan menunjukkan dedikasi dan inovasi yang tinggi dalam pekerjaannya.',
+    approvedBy: '4',
+    approvedDate: '2023-12-10'
+  }
 ];
 
 export const evaluationCriteria: EvaluationCriteria[] = [
@@ -231,84 +307,6 @@ export const evaluationCriteria: EvaluationCriteria[] = [
   },
 ];
 
-// User departments
-export const departments: Department[] = [
-  {
-    id: '1',
-    name: 'Engineering',
-    description: 'Departemen pengembangan perangkat lunak dan infrastruktur IT',
-  },
-  {
-    id: '2',
-    name: 'Human Resources',
-    description: 'Departemen pengelolaan sumber daya manusia',
-  },
-  {
-    id: '3',
-    name: 'Marketing',
-    description: 'Departemen pemasaran dan promosi produk',
-  },
-  {
-    id: '4',
-    name: 'Finance',
-    description: 'Departemen keuangan dan akuntansi',
-  },
-  {
-    id: '5',
-    name: 'Product',
-    description: 'Departemen pengembangan dan manajemen produk',
-  },
-];
-
-// Evaluations data
-export const evaluations: Evaluation[] = [
-  {
-    id: '1',
-    employeeId: '1',
-    managerId: '2',
-    date: '2023-10-15',
-    status: 'pending',
-    criteriaScores: [
-      { criteriaId: '1', score: 85 },
-      { criteriaId: '2', score: 90 },
-      { criteriaId: '3', score: 80 },
-      { criteriaId: '4', score: 95 },
-    ],
-    overallComment: 'Karyawan menunjukkan kinerja yang baik dalam proyek-proyek yang ditangani.'
-  },
-  {
-    id: '2',
-    employeeId: '2',
-    managerId: '2',
-    date: '2023-11-20',
-    status: 'pending',
-    criteriaScores: [
-      { criteriaId: '1', score: 75 },
-      { criteriaId: '2', score: 80 },
-      { criteriaId: '3', score: 85 },
-      { criteriaId: '4', score: 70 },
-    ],
-    overallComment: 'Perlu meningkatkan keterampilan komunikasi dan kolaborasi dalam tim.'
-  },
-  {
-    id: '3',
-    employeeId: '3',
-    managerId: '2',
-    date: '2023-12-05',
-    status: 'approved',
-    criteriaScores: [
-      { criteriaId: '1', score: 95 },
-      { criteriaId: '2', score: 90 },
-      { criteriaId: '3', score: 85 },
-      { criteriaId: '4', score: 90 },
-    ],
-    overallComment: 'Karyawan menunjukkan dedikasi dan inovasi yang tinggi dalam pekerjaannya.',
-    approvedBy: '4',
-    approvedDate: '2023-12-10'
-  }
-];
-
-// Documents data
 export const documents: Document[] = [
   {
     id: '1',
@@ -362,20 +360,32 @@ export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
 };
 
-// Employee CRUD operations
-let employeesData = [...employees];
+// EMPLOYEE OPERATIONS
+export const getEmployees = (): Employee[] => {
+  return [...employeesData];
+};
 
 export const getEmployeeById = (id: string): Employee | undefined => {
   return employeesData.find(emp => emp.id === id);
 };
 
 export const addEmployee = (newEmployeeData: Omit<Employee, 'id'>): Employee => {
-  const newId = (employeesData.length + 1).toString();
+  const newId = (Math.max(...employeesData.map(e => parseInt(e.id)), 0) + 1).toString();
   const newEmployee = {
     id: newId,
     ...newEmployeeData,
   };
   employeesData.push(newEmployee);
+
+  // Update department list if it's a new department
+  const departmentExists = departmentsData.some(dept => dept.name === newEmployee.department);
+  if (!departmentExists) {
+    addDepartment({
+      name: newEmployee.department,
+      description: `Departemen ${newEmployee.department}`
+    });
+  }
+
   return newEmployee;
 };
 
@@ -387,53 +397,241 @@ export const updateEmployee = (id: string, updatedData: Partial<Employee>): Empl
     ...employeesData[index],
     ...updatedData
   };
+
+  // Update department list if it's a new department
+  if (updatedData.department) {
+    const departmentExists = departmentsData.some(dept => dept.name === updatedData.department);
+    if (!departmentExists) {
+      addDepartment({
+        name: updatedData.department,
+        description: `Departemen ${updatedData.department}`
+      });
+    }
+  }
+
   return employeesData[index];
 };
 
 export const deleteEmployee = (id: string): boolean => {
   const initialLength = employeesData.length;
   employeesData = employeesData.filter(emp => emp.id !== id);
+  
+  // Also delete any evaluations for this employee
+  evaluationsData = evaluationsData.filter(eval => eval.employeeId !== id);
+  
   return employeesData.length < initialLength;
 };
 
-// Policy functions
-export const getPolicyById = (id: string): Policy | undefined => {
-  return policies.find(policy => policy.id === id);
+// DEPARTMENT OPERATIONS
+export const getDepartments = (): Department[] => {
+  return [...departmentsData];
 };
 
-// User authentication functions
-let currentUser: User | null = null;
-
-export const getCurrentUser = (): User | null => {
-  return currentUser;
+export const getDepartmentByName = (name: string): Department | undefined => {
+  return departmentsData.find(dep => dep.name === name);
 };
 
-export const setCurrentUser = (user: User | null): void => {
-  currentUser = user;
+export const getDepartmentById = (id: string): Department | undefined => {
+  return departmentsData.find(dep => dep.id === id);
 };
 
-export const getUserByEmailAndPassword = (email: string, password: string): User | null => {
-  const user = users.find(u => u.email === email && u.password === password);
-  return user || null;
+export const addDepartment = (departmentData: Omit<Department, 'id'>): Department => {
+  const newId = (Math.max(...departmentsData.map(d => parseInt(d.id)), 0) + 1).toString();
+  const newDepartment = {
+    id: newId,
+    ...departmentData,
+  };
+  departmentsData.push(newDepartment);
+  return newDepartment;
 };
 
-// Evaluation functions
+export const updateDepartment = (id: string, updatedData: Partial<Department>): Department | null => {
+  const index = departmentsData.findIndex(dept => dept.id === id);
+  if (index === -1) return null;
+  
+  departmentsData[index] = {
+    ...departmentsData[index],
+    ...updatedData
+  };
+  
+  // Update employee department names if department name changed
+  if (updatedData.name && updatedData.name !== departmentsData[index].name) {
+    const oldName = departmentsData[index].name;
+    employeesData = employeesData.map(emp => {
+      if (emp.department === oldName) {
+        return { ...emp, department: updatedData.name as string };
+      }
+      return emp;
+    });
+  }
+  
+  return departmentsData[index];
+};
+
+export const deleteDepartment = (id: string): boolean => {
+  // Check if there are employees in this department
+  const department = getDepartmentById(id);
+  if (!department) return false;
+  
+  const employeesInDepartment = employeesData.some(emp => emp.department === department.name);
+  if (employeesInDepartment) {
+    // Cannot delete department with employees
+    return false;
+  }
+  
+  const initialLength = departmentsData.length;
+  departmentsData = departmentsData.filter(dept => dept.id !== id);
+  return departmentsData.length < initialLength;
+};
+
+// EVALUATION OPERATIONS
+export const getEvaluations = (): Evaluation[] => {
+  return [...evaluationsData];
+};
+
+export const getEvaluationById = (id: string): Evaluation | undefined => {
+  return evaluationsData.find(eval => eval.id === id);
+};
+
+export const getEmployeeEvaluations = (employeeId: string): Evaluation[] => {
+  return evaluationsData.filter(eval => eval.employeeId === employeeId);
+};
+
+export const addEvaluation = (evaluationData: Omit<Evaluation, 'id'>): Evaluation => {
+  const newId = (Math.max(...evaluationsData.map(e => parseInt(e.id)), 0) + 1).toString();
+  const newEvaluation = {
+    id: newId,
+    ...evaluationData,
+  };
+  evaluationsData.push(newEvaluation);
+  
+  // Update employee performance and personality scores based on evaluation
+  const employee = getEmployeeById(evaluationData.employeeId);
+  if (employee) {
+    const performanceCriteria = evaluationCriteria.filter(c => c.category === 'performance');
+    const personalityCriteria = evaluationCriteria.filter(c => c.category === 'personality');
+    
+    // Calculate new scores
+    let performanceScore = 0;
+    let performanceWeight = 0;
+    let personalityScore = 0; 
+    let personalityWeight = 0;
+    
+    evaluationData.criteriaScores.forEach(criteriaScore => {
+      const criteria = evaluationCriteria.find(c => c.id === criteriaScore.criteriaId);
+      if (criteria) {
+        if (criteria.category === 'performance') {
+          performanceScore += criteriaScore.score * criteria.weight;
+          performanceWeight += criteria.weight;
+        } else {
+          personalityScore += criteriaScore.score * criteria.weight;
+          personalityWeight += criteria.weight;
+        }
+      }
+    });
+    
+    // Update employee with calculated scores
+    const updatedEmployee: Partial<Employee> = {
+      performance: performanceWeight > 0 ? Math.round(performanceScore / performanceWeight) : employee.performance,
+      personality: personalityWeight > 0 ? Math.round(personalityScore / personalityWeight) : employee.personality
+    };
+    
+    updateEmployee(employee.id, updatedEmployee);
+  }
+  
+  return newEvaluation;
+};
+
+export const updateEvaluation = (id: string, updatedData: Partial<Evaluation>): Evaluation | null => {
+  const index = evaluationsData.findIndex(eval => eval.id === id);
+  if (index === -1) return null;
+  
+  // Keep track of old and new criteria scores for employee update
+  const oldEvaluation = evaluationsData[index];
+  const newCriteriaScores = updatedData.criteriaScores || oldEvaluation.criteriaScores;
+  
+  // Update the evaluation
+  evaluationsData[index] = {
+    ...evaluationsData[index],
+    ...updatedData,
+    criteriaScores: newCriteriaScores
+  };
+  
+  // Update employee performance and personality if criteria scores changed
+  if (updatedData.criteriaScores && updatedData.criteriaScores.length > 0) {
+    const employee = getEmployeeById(oldEvaluation.employeeId);
+    if (employee) {
+      const performanceCriteria = evaluationCriteria.filter(c => c.category === 'performance');
+      const personalityCriteria = evaluationCriteria.filter(c => c.category === 'personality');
+      
+      // Calculate new scores
+      let performanceScore = 0;
+      let performanceWeight = 0;
+      let personalityScore = 0; 
+      let personalityWeight = 0;
+      
+      newCriteriaScores.forEach(criteriaScore => {
+        const criteria = evaluationCriteria.find(c => c.id === criteriaScore.criteriaId);
+        if (criteria) {
+          if (criteria.category === 'performance') {
+            performanceScore += criteriaScore.score * criteria.weight;
+            performanceWeight += criteria.weight;
+          } else {
+            personalityScore += criteriaScore.score * criteria.weight;
+            personalityWeight += criteria.weight;
+          }
+        }
+      });
+      
+      // Update employee with calculated scores
+      const updatedEmployee: Partial<Employee> = {
+        performance: performanceWeight > 0 ? Math.round(performanceScore / performanceWeight) : employee.performance,
+        personality: personalityWeight > 0 ? Math.round(personalityScore / personalityWeight) : employee.personality
+      };
+      
+      updateEmployee(employee.id, updatedEmployee);
+    }
+  }
+  
+  return evaluationsData[index];
+};
+
+export const deleteEvaluation = (id: string): boolean => {
+  const initialLength = evaluationsData.length;
+  evaluationsData = evaluationsData.filter(eval => eval.id !== id);
+  return evaluationsData.length < initialLength;
+};
+
 export const getEvaluationsPendingApproval = (): Evaluation[] => {
-  return evaluations.filter(evaluation => evaluation.status === 'pending');
+  return evaluationsData.filter(evaluation => evaluation.status === 'pending');
 };
 
 export const approveEvaluation = (evaluationId: string, approverId: string): Evaluation | null => {
-  const index = evaluations.findIndex(evaluation => evaluation.id === evaluationId);
+  const index = evaluationsData.findIndex(evaluation => evaluation.id === evaluationId);
   if (index === -1) return null;
   
-  evaluations[index] = {
-    ...evaluations[index],
+  evaluationsData[index] = {
+    ...evaluationsData[index],
     status: 'approved',
     approvedBy: approverId,
     approvedDate: new Date().toISOString().split('T')[0]
   };
   
-  return evaluations[index];
+  return evaluationsData[index];
+};
+
+export const rejectEvaluation = (evaluationId: string, approverId: string): Evaluation | null => {
+  const index = evaluationsData.findIndex(evaluation => evaluation.id === evaluationId);
+  if (index === -1) return null;
+  
+  evaluationsData[index] = {
+    ...evaluationsData[index],
+    status: 'rejected',
+    approvedBy: approverId,
+    approvedDate: new Date().toISOString().split('T')[0]
+  };
+  
+  return evaluationsData[index];
 };
 
 // Criteria management
@@ -477,3 +675,101 @@ export const getPromotionCandidates = (): Employee[] => {
     return score >= 85; // Threshold for promotion eligibility
   });
 };
+
+// Reset data to initial state (useful for tests and demos)
+export const resetData = (): void => {
+  employeesData = [...initialEmployees];
+  evaluationsData = [
+    {
+      id: '1',
+      employeeId: '1',
+      managerId: '2',
+      date: '2023-10-15',
+      status: 'pending',
+      criteriaScores: [
+        { criteriaId: '1', score: 85 },
+        { criteriaId: '2', score: 90 },
+        { criteriaId: '3', score: 80 },
+        { criteriaId: '4', score: 95 },
+      ],
+      overallComment: 'Karyawan menunjukkan kinerja yang baik dalam proyek-proyek yang ditangani.'
+    },
+    {
+      id: '2',
+      employeeId: '2',
+      managerId: '2',
+      date: '2023-11-20',
+      status: 'pending',
+      criteriaScores: [
+        { criteriaId: '1', score: 75 },
+        { criteriaId: '2', score: 80 },
+        { criteriaId: '3', score: 85 },
+        { criteriaId: '4', score: 70 },
+      ],
+      overallComment: 'Perlu meningkatkan keterampilan komunikasi dan kolaborasi dalam tim.'
+    },
+    {
+      id: '3',
+      employeeId: '3',
+      managerId: '2',
+      date: '2023-12-05',
+      status: 'approved',
+      criteriaScores: [
+        { criteriaId: '1', score: 95 },
+        { criteriaId: '2', score: 90 },
+        { criteriaId: '3', score: 85 },
+        { criteriaId: '4', score: 90 },
+      ],
+      overallComment: 'Karyawan menunjukkan dedikasi dan inovasi yang tinggi dalam pekerjaannya.',
+      approvedBy: '4',
+      approvedDate: '2023-12-10'
+    }
+  ];
+  departmentsData = [
+    {
+      id: '1',
+      name: 'Engineering',
+      description: 'Departemen pengembangan perangkat lunak dan infrastruktur IT',
+    },
+    {
+      id: '2',
+      name: 'Human Resources',
+      description: 'Departemen pengelolaan sumber daya manusia',
+    },
+    {
+      id: '3',
+      name: 'Marketing',
+      description: 'Departemen pemasaran dan promosi produk',
+    },
+    {
+      id: '4',
+      name: 'Finance',
+      description: 'Departemen keuangan dan akuntansi',
+    },
+    {
+      id: '5',
+      name: 'Product',
+      description: 'Departemen pengembangan dan manajemen produk',
+    },
+  ];
+};
+
+// User authentication functions
+let currentUser: User | null = null;
+
+export const getCurrentUser = (): User | null => {
+  return currentUser;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  currentUser = user;
+};
+
+export const getUserByEmailAndPassword = (email: string, password: string): User | null => {
+  const user = users.find(u => u.email === email && u.password === password);
+  return user || null;
+};
+
+// Expose employees for other files
+export const employees = employeesData;
+export const departments = departmentsData;

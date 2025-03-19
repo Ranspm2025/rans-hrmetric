@@ -7,7 +7,12 @@ import EmployeeCard from '@/components/EmployeeCard';
 import EmployeeList from '@/components/EmployeeList';
 import EmployeeFilters from '@/components/EmployeeFilters';
 import AddEmployeeDialog from '@/components/AddEmployeeDialog';
-import { employees, getPromotionScore, getEmployeeById } from '@/lib/data';
+import { 
+  getEmployees, 
+  getPromotionScore, 
+  getEmployeeById, 
+  getDepartments 
+} from '@/lib/data';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,12 +26,13 @@ const Employees = () => {
   const [sortField, setSortField] = useState<SortField>('promotionScore');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [viewMode, setViewMode] = useState<ViewMode>('card');
+  const [employeesList, setEmployeesList] = useState(getEmployees());
   const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const departments = [...new Set(employees.map(employee => employee.department))];
+  const departmentsList = getDepartments().map(dept => dept.name);
 
   useEffect(() => {
     const editParam = searchParams.get('edit');
@@ -65,9 +71,12 @@ const Employees = () => {
       // No redirection, allow viewing all employees
       return;
     }
+    
+    // Refresh employee list
+    setEmployeesList(getEmployees());
   }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
 
-  const filteredEmployees = employees.filter(employee => {
+  const filteredEmployees = employeesList.filter(employee => {
     // All users can view employee list
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
@@ -123,12 +132,17 @@ const Employees = () => {
   };
 
   const handleRefresh = () => {
-    // This function will be called when a new employee is added
-    // In a real app, you would fetch the updated list of employees
-    console.log("Refreshing employee list");
+    // Refresh employee list
+    setEmployeesList(getEmployees());
   };
 
   const handleEvaluateEmployee = (id: string) => {
+    // If this is just a refresh call, refresh the data
+    if (id === 'refresh') {
+      handleRefresh();
+      return;
+    }
+    
     if (!isManager) {
       // Only managers can evaluate employees
       navigate(`/evaluation?employeeId=${id}&view=true`);
@@ -180,7 +194,7 @@ const Employees = () => {
           
           {(isAdmin || isManager) && (
             <AddEmployeeDialog 
-              departments={departments} 
+              departments={departmentsList} 
               onEmployeeAdded={handleRefresh} 
             />
           )}
@@ -196,7 +210,7 @@ const Employees = () => {
           sortOrder={sortOrder}
           onSortOrderToggle={toggleSortOrder}
           onResetFilters={resetFilters}
-          departments={departments}
+          departments={departmentsList}
           viewMode={viewMode}
           onViewModeChange={handleViewModeChange}
         />

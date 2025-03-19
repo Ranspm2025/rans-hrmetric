@@ -1,10 +1,18 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Filter, UserPlus, Mail, Phone, Building, User, Trash, PenLine } from 'lucide-react';
+import { Plus, Search, Filter, UserPlus, Building, User, Trash, PenLine } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
-import { employees, addEmployee, getEmployeeById, deleteEmployee } from '@/lib/data';
+import { 
+  getEmployees, 
+  getDepartments,
+  addEmployee, 
+  getEmployeeById, 
+  deleteEmployee, 
+  addDepartment,
+  deleteDepartment 
+} from '@/lib/data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -35,13 +43,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import AddEmployeeDialog from '@/components/AddEmployeeDialog';
 
 const ManageEmployees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [employeesList, setEmployeesList] = useState(getEmployees());
+  const [departmentsList, setDepartmentsList] = useState(getDepartments().map(dept => dept.name));
   const [newEmployee, setNewEmployee] = useState({
     name: '',
     position: '',
@@ -53,12 +63,28 @@ const ManageEmployees = () => {
   });
   const { toast } = useToast();
 
-  const [departments, setDepartments] = useState([...new Set(employees.map(employee => employee.department))]);
   const [newDepartmentName, setNewDepartmentName] = useState('');
 
+  // Refresh the lists when needed
+  const refreshData = () => {
+    setEmployeesList(getEmployees());
+    setDepartmentsList(getDepartments().map(dept => dept.name));
+  };
+
   const handleDeleteDepartment = (departmentToDelete: string) => {
-    const employeesInDepartment = employees.filter(emp => emp.department === departmentToDelete);
-    if (employeesInDepartment.length > 0) {
+    // Find department ID by name
+    const department = getDepartments().find(dept => dept.name === departmentToDelete);
+    if (!department) {
+      toast({
+        title: "Departemen tidak ditemukan",
+        description: "Tidak dapat menemukan departemen yang dipilih.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const employeesInDepartment = employeesList.some(emp => emp.department === departmentToDelete);
+    if (employeesInDepartment) {
       toast({
         title: "Tidak dapat menghapus departemen",
         description: "Pindahkan semua karyawan ke departemen lain terlebih dahulu.",
@@ -66,11 +92,20 @@ const ManageEmployees = () => {
       });
       return;
     }
-    setDepartments(prev => prev.filter(dept => dept !== departmentToDelete));
-    toast({
-      title: "Departemen Dihapus",
-      description: `Departemen ${departmentToDelete} telah dihapus.`
-    });
+    
+    if (deleteDepartment(department.id)) {
+      toast({
+        title: "Departemen Dihapus",
+        description: `Departemen ${departmentToDelete} telah dihapus.`
+      });
+      refreshData();
+    } else {
+      toast({
+        title: "Gagal menghapus departemen",
+        description: "Terjadi kesalahan saat menghapus departemen.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleAddNewDepartment = (newDepartment: string) => {
@@ -83,7 +118,7 @@ const ManageEmployees = () => {
       });
       return;
     }
-    if (departments.includes(trimmedDepartment)) {
+    if (departmentsList.includes(trimmedDepartment)) {
       toast({
         title: "Departemen sudah ada",
         description: "Silakan gunakan nama departemen yang berbeda.",
@@ -91,15 +126,22 @@ const ManageEmployees = () => {
       });
       return;
     }
-    setDepartments(prev => [...prev, trimmedDepartment]);
+    
+    addDepartment({
+      name: trimmedDepartment,
+      description: `Departemen ${trimmedDepartment}`
+    });
+    
     setNewDepartmentName('');
+    refreshData();
+    
     toast({
       title: "Departemen Ditambahkan",
       description: `Departemen ${trimmedDepartment} telah ditambahkan.`
     });
   };
 
-  const filteredEmployees = employees.filter(employee => {
+  const filteredEmployees = employeesList.filter(employee => {
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
@@ -132,6 +174,7 @@ const ManageEmployees = () => {
       description: `${employee.name} telah ditambahkan sebagai ${employee.position}`,
     });
     
+    refreshData();
     setIsDialogOpen(false);
     setNewEmployee({
       name: '',
@@ -159,6 +202,7 @@ const ManageEmployees = () => {
           title: "Karyawan Berhasil Dihapus",
           description: `${employee.name} telah dihapus dari sistem`,
         });
+        refreshData();
       } else {
         toast({
           title: "Gagal Menghapus Karyawan",
@@ -167,6 +211,10 @@ const ManageEmployees = () => {
         });
       }
     }
+  };
+
+  const handleEmployeeAdded = () => {
+    refreshData();
   };
 
   return (
@@ -215,7 +263,7 @@ const ManageEmployees = () => {
                   <div className="space-y-2">
                     <Label>Daftar Departemen</Label>
                     <div className="space-y-2">
-                      {departments.map((dept) => (
+                      {departmentsList.map((dept) => (
                         <div key={dept} className="flex items-center justify-between p-2 border rounded-md">
                           <span>{dept}</span>
                           <AlertDialog>
@@ -250,87 +298,10 @@ const ManageEmployees = () => {
               </DialogContent>
             </Dialog>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  Tambah Karyawan
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <form onSubmit={handleSubmit}>
-                  <DialogHeader>
-                    <DialogTitle>Tambah Karyawan Baru</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nama Lengkap</Label>
-                      <Input
-                        id="name"
-                        value={newEmployee.name}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan nama lengkap"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="position">Posisi / Jabatan</Label>
-                      <Input
-                        id="position"
-                        value={newEmployee.position}
-                        onChange={handleInputChange}
-                        placeholder="Masukkan posisi"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="department">Departemen</Label>
-                        <Select value={newEmployee.department} onValueChange={handleSelectChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih departemen" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="new">+ Tambah Departemen Baru</SelectItem>
-                            {departments.map((department) => (
-                              <SelectItem key={department} value={department}>
-                                {department}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {newEmployee.department === 'new' && (
-                        <div className="space-y-2">
-                          <Label htmlFor="newDepartment">Nama Departemen Baru</Label>
-                          <Input
-                            id="newDepartment"
-                            placeholder="Masukkan nama departemen"
-                            value={newDepartmentName}
-                            onChange={(e) => {
-                              setNewDepartmentName(e.target.value);
-                              if (e.target.value.trim()) {
-                                setNewEmployee(prev => ({ ...prev, department: e.target.value.trim() }));
-                              }
-                            }}
-                            required
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Batal
-                    </Button>
-                    <Button type="submit">Tambah Karyawan</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <AddEmployeeDialog
+              departments={departmentsList}
+              onEmployeeAdded={handleEmployeeAdded}
+            />
           </div>
         </motion.div>
         
@@ -354,7 +325,7 @@ const ManageEmployees = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">Semua Departemen</SelectItem>
-                {departments.map((department) => (
+                {departmentsList.map((department) => (
                   <SelectItem key={department} value={department}>
                     {department}
                   </SelectItem>
@@ -386,7 +357,7 @@ const ManageEmployees = () => {
                     Tambah
                   </Button>
                 </div>
-                {departments.map((department) => (
+                {departmentsList.map((department) => (
                   <div key={department} className="flex items-center justify-between p-2 rounded-lg border">
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-muted-foreground" />

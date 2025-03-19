@@ -44,7 +44,7 @@ interface EmployeeListProps {
 }
 
 const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) => {
-  const { isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
+  const { isAdmin, isManager, isPemimpin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -82,6 +82,11 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
           title: "Hapus Karyawan",
           description: `${employee.name} berhasil dihapus dari sistem`,
         });
+        // Force a re-render by triggering a state update in the parent component
+        if (onEvaluate) {
+          // We're just using this as a hack to trigger parent re-render
+          onEvaluate('refresh');
+        }
       } else {
         toast({
           title: "Error",

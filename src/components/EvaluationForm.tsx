@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CheckCircle, HelpCircle } from 'lucide-react';
-import { evaluationCriteria, getEmployeeById } from '@/lib/data';
-import { Employee } from '@/types';
+import { evaluationCriteria, getEmployeeById, addEvaluation, updateEvaluation, getEvaluationById } from '@/lib/data';
+import { Employee, CriteriaScore } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -16,26 +16,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Textarea } from '@/components/ui/textarea';
 
 interface EvaluationFormProps {
   employeeId?: string;
+  evaluationId?: string;
 }
 
-const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
+const EvaluationForm = ({ employeeId, evaluationId }: EvaluationFormProps) => {
   const [employee, setEmployee] = useState<Employee | undefined>(
     employeeId ? getEmployeeById(employeeId) : undefined
   );
   const [step, setStep] = useState(1);
   const [selectedTab, setSelectedTab] = useState('performance');
   const [formData, setFormData] = useState<Record<string, number>>({});
+  const [comment, setComment] = useState('');
   const [progress, setProgress] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const { user, isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
   const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(window.location.search);
-  const viewOnly = searchParams.get('view') === 'true';
+  const viewOnly = searchParams.get('view') === 'true' || (!isManager && !isAdmin);
 
   useEffect(() => {
     // Only managers and admins can perform evaluations
@@ -47,19 +49,38 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
       });
       navigate('/');
     }
-  }, [isManager, isAdmin, viewOnly, toast, navigate]);
+    
+    // If evaluationId is provided, load the evaluation data
+    if (evaluationId) {
+      const evaluation = getEvaluationById(evaluationId);
+      if (evaluation) {
+        // Load scores into formData
+        const scores: Record<string, number> = {};
+        evaluation.criteriaScores.forEach(score => {
+          scores[score.criteriaId] = score.score;
+        });
+        setFormData(scores);
+        setComment(evaluation.overallComment || '');
+        
+        // If employee wasn't provided in props, get it from the evaluation
+        if (!employeeId) {
+          setEmployee(getEmployeeById(evaluation.employeeId));
+        }
+      }
+    }
+  }, [isManager, isAdmin, viewOnly, toast, navigate, evaluationId, employeeId]);
 
   const handleBack = () => {
     navigate('/employees');
   };
 
-  // Show evaluation results for non-managers/non-admins
-  if ((!isManager && !isAdmin) || viewOnly) {
+  // Show evaluation results for non-managers/non-admins or in view mode
+  if (viewOnly) {
     return (
       <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Hasil Penilaian</CardTitle>
-          <CardDescription>Hasil penilaian kinerja dan kepribadian Anda</CardDescription>
+          <CardDescription>Hasil penilaian kinerja dan kepribadian</CardDescription>
           {employee && (
             <div className="flex items-center gap-3 mt-4">
               <Avatar className="h-10 w-10 border-2 border-primary/20">
@@ -93,6 +114,17 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
             </div>
           </div>
         </CardContent>
+        <CardFooter className="border-t bg-muted/20 flex justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBack}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Kembali
+          </Button>
+        </CardFooter>
       </Card>
     );
   }
@@ -117,8 +149,10 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const handleStepChange = (newStep: number) => {
     if (newStep === 1) {
       setSelectedTab('performance');
-    } else {
+    } else if (newStep === 2) {
       setSelectedTab('personality');
+    } else {
+      setSelectedTab('comments');
     }
     setStep(newStep);
   };
@@ -138,7 +172,22 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
       return;
     }
     
-    // Calculate scores
+    if (!employee) {
+      toast({
+        title: "Error",
+        description: "Data karyawan tidak ditemukan.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Prepare criteria scores
+    const criteriaScores: CriteriaScore[] = Object.keys(formData).map(criteriaId => ({
+      criteriaId,
+      score: formData[criteriaId]
+    }));
+    
+    // Calculate scores for display
     const performanceScore = performanceCriteria.reduce((total, criteria) => {
       return total + ((formData[criteria.id] || 0) * criteria.weight / 100);
     }, 0);
@@ -147,16 +196,39 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
       return total + ((formData[criteria.id] || 0) * criteria.weight / 100);
     }, 0);
     
-    toast({
-      title: "Penilaian Berhasil",
-      description: `Skor Kinerja: ${performanceScore.toFixed(1)}, Skor Kepribadian: ${personalityScore.toFixed(1)}`,
-      variant: "default"
-    });
+    // If evaluationId exists, update the evaluation
+    if (evaluationId) {
+      updateEvaluation(evaluationId, {
+        criteriaScores,
+        overallComment: comment,
+        date: new Date().toISOString().split('T')[0]
+      });
+      
+      toast({
+        title: "Penilaian Berhasil Diperbarui",
+        description: `Skor Kinerja: ${performanceScore.toFixed(1)}, Skor Kepribadian: ${personalityScore.toFixed(1)}`,
+        variant: "default"
+      });
+    } else {
+      // Create new evaluation
+      addEvaluation({
+        employeeId: employee.id,
+        managerId: user?.id || '',
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        criteriaScores,
+        overallComment: comment
+      });
+      
+      toast({
+        title: "Penilaian Berhasil Disimpan",
+        description: `Skor Kinerja: ${performanceScore.toFixed(1)}, Skor Kepribadian: ${personalityScore.toFixed(1)}`,
+        variant: "default"
+      });
+    }
     
-    // Reset form after submission
-    setFormData({});
-    setStep(1);
-    setSelectedTab('performance');
+    // Navigate back to employees list
+    navigate('/employees');
   };
 
   return (
@@ -209,6 +281,9 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
                 </TabsTrigger>
                 <TabsTrigger value="personality" onClick={() => handleStepChange(2)} className="w-full">
                   Kepribadian
+                </TabsTrigger>
+                <TabsTrigger value="comments" onClick={() => handleStepChange(3)} className="w-full">
+                  Komentar
                 </TabsTrigger>
               </TabsList>
               
@@ -294,6 +369,24 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
                   </div>
                 ))}
               </TabsContent>
+              
+              <TabsContent value="comments" className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="comments" className="text-sm font-medium">
+                      Komentar Keseluruhan
+                    </Label>
+                    <Textarea
+                      id="comments"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Berikan komentar tentang kinerja dan kepribadian karyawan secara keseluruhan..."
+                      className="mt-2"
+                      rows={6}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
           </CardContent>
           <CardFooter className="border-t p-6 flex justify-between bg-muted/20">
@@ -303,21 +396,21 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleStepChange(1)}
+                onClick={() => handleStepChange(step - 1)}
                 className="gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Kinerja
+                {step === 2 ? 'Kinerja' : 'Kepribadian'}
               </Button>
             )}
             
-            {step === 1 ? (
+            {step < 3 ? (
               <Button
                 type="button"
-                onClick={() => handleStepChange(2)}
+                onClick={() => handleStepChange(step + 1)}
                 className="gap-1"
               >
-                Kepribadian
+                {step === 1 ? 'Kepribadian' : 'Komentar'}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
