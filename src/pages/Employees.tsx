@@ -38,21 +38,8 @@ const Employees = () => {
         navigate(`/evaluation?employeeId=${evaluateParam}`);
         return;
       } else if (isKaryawan && user) {
-        // For employees, only allow viewing their own evaluation
-        const userEmployee = employees.find(
-          emp => emp.name.toLowerCase() === user.name.toLowerCase()
-        );
-        
-        if (userEmployee && evaluateParam === userEmployee.id) {
-          navigate(`/evaluation?employeeId=${evaluateParam}`);
-          return;
-        }
-        toast({
-          title: "Akses Ditolak",
-          description: "Anda hanya dapat melihat evaluasi diri sendiri",
-          variant: "destructive"
-        });
-        navigate('/');
+        // Allow employees to view any evaluation in read-only mode
+        navigate(`/evaluation?employeeId=${evaluateParam}&view=true`);
         return;
       }
     }
@@ -73,31 +60,15 @@ const Employees = () => {
       }
     }
 
-    // If regular user, show only their profile
+    // Regular employees can view all employee evaluations
     if (isKaryawan && !isAdmin && !isManager && !isPemimpin && user) {
-      const userEmployee = employees.find(
-        emp => emp.name.toLowerCase() === user.name.toLowerCase()
-      );
-      
-      if (userEmployee) {
-        navigate(`/evaluation?employeeId=${userEmployee.id}`);
-      } else {
-        toast({
-          title: "Profil tidak ditemukan",
-          description: "Profil karyawan Anda tidak ditemukan dalam sistem",
-          variant: "destructive"
-        });
-        navigate('/');
-      }
+      // No redirection, allow viewing all employees
+      return;
     }
   }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
 
   const filteredEmployees = employees.filter(employee => {
-    // Regular users should only see their own profile
-    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-      return user && employee.name.toLowerCase() === user.name.toLowerCase();
-    }
-
+    // All users can view employee list
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
@@ -186,30 +157,9 @@ const Employees = () => {
     }
   };
 
-  // If user is a basic employee, we'll redirect them in the useEffect
-  if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-        <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-20">
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center h-64"
-          >
-            <div className="text-center">
-              <h2 className="text-xl font-medium">Mengalihkan ke halaman profil...</h2>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Navbar />
-      
       <div className="container mx-auto px-4 pt-24 pb-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -235,6 +185,60 @@ const Employees = () => {
             />
           )}
         </motion.div>
+        
+        <EmployeeFilters 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          departmentFilter={departmentFilter}
+          onDepartmentFilterChange={setDepartmentFilter}
+          sortField={sortField}
+          onSortFieldChange={(value) => setSortField(value as SortField)}
+          sortOrder={sortOrder}
+          onSortOrderToggle={toggleSortOrder}
+          onResetFilters={resetFilters}
+          departments={departments}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
+        />
+        
+        {sortedEmployees.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center py-12 bg-card rounded-lg shadow p-8"
+          >
+            <p className="text-muted-foreground">Tidak ada karyawan yang ditemukan.</p>
+            <button onClick={resetFilters} className="mt-2 text-primary hover:underline">
+              Reset filter
+            </button>
+          </motion.div>
+        ) : viewMode === 'card' ? (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {sortedEmployees.map((employee, index) => (
+              <EmployeeCard 
+                key={employee.id} 
+                employee={employee} 
+                index={index} 
+                onEvaluate={handleEvaluateEmployee}
+                onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <EmployeeList 
+            employees={sortedEmployees} 
+            onEvaluate={handleEvaluateEmployee}
+            onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+          />
+        )}
+      </div>
+    </div>
         
         <EmployeeFilters 
           searchTerm={searchTerm}
