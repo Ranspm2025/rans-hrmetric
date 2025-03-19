@@ -105,6 +105,29 @@ export const policies: Policy[] = [
   },
 ];
 
+let employees: Employee[] = [
+
+export const getEmployeeById = (id: string): Employee | undefined => {
+  return employees.find(emp => emp.id === id);
+};
+
+export const updateEmployee = (id: string, updatedData: Partial<Employee>): Employee | null => {
+  const index = employees.findIndex(emp => emp.id === id);
+  if (index === -1) return null;
+  
+  employees[index] = {
+    ...employees[index],
+    ...updatedData
+  };
+  return employees[index];
+};
+
+export const deleteEmployee = (id: string): boolean => {
+  const initialLength = employees.length;
+  employees = employees.filter(emp => emp.id !== id);
+  return employees.length < initialLength;
+};
+
 export const employees: Employee[] = [
   {
     id: '1',

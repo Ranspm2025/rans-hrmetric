@@ -133,40 +133,11 @@ const ManageEmployees = () => {
     });
   };
 
-  const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editedEmployee, setEditedEmployee] = useState({
-    name: '',
-    position: '',
-    department: '',
-  });
-
   const handleEditEmployee = (id: string) => {
-    const employee = getEmployeeById(id);
-    if (employee) {
-      setEmployeeToEdit(employee);
-      setEditedEmployee({
-        name: employee.name,
-        position: employee.position,
-        department: employee.department,
-      });
-      setIsEditDialogOpen(true);
-    }
-  };
-
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (employeeToEdit) {
-      const updatedEmployee = updateEmployee(employeeToEdit.id, editedEmployee);
-      if (updatedEmployee) {
-        toast({
-          title: "Karyawan Berhasil Diperbarui",
-          description: `Data ${updatedEmployee.name} telah diperbarui`,
-        });
-        setIsEditDialogOpen(false);
-        setEmployeeToEdit(null);
-      }
-    }
+    toast({
+      title: "Edit Karyawan",
+      description: "Fitur edit karyawan akan segera tersedia",
+    });
   };
 
   const handleDeleteEmployee = (id: string) => {
@@ -190,62 +161,6 @@ const ManageEmployees = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
-      {/* Edit Employee Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <form onSubmit={handleEditSubmit}>
-            <DialogHeader>
-              <DialogTitle>Edit Karyawan</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nama Lengkap</Label>
-                <Input
-                  id="name"
-                  value={editedEmployee.name}
-                  onChange={(e) => setEditedEmployee(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Masukkan nama lengkap"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="position">Posisi / Jabatan</Label>
-                <Input
-                  id="position"
-                  value={editedEmployee.position}
-                  onChange={(e) => setEditedEmployee(prev => ({ ...prev, position: e.target.value }))}
-                  placeholder="Masukkan posisi"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="department">Departemen</Label>
-                <Select value={editedEmployee.department} onValueChange={(value) => setEditedEmployee(prev => ({ ...prev, department: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih departemen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((department) => (
-                      <SelectItem key={department} value={department}>
-                        {department}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Batal
-              </Button>
-              <Button type="submit">Simpan Perubahan</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
       
       <div className="container mx-auto px-4 pt-32 pb-20">
         <motion.div

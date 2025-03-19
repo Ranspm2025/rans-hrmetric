@@ -50,8 +50,8 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
   const handleEvaluate = (id: string) => {
-    if (isManager) {
-      // Managers can perform evaluations
+    if (isManager || isAdmin) {
+      // Managers and admins can perform evaluations
       if (onEvaluate) {
         onEvaluate(id);
       }
