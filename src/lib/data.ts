@@ -1,107 +1,121 @@
 
-export interface Policy {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  lastUpdated: string;
-}
+import type { User, Employee, EvaluationCriteria, Department, Policy } from '@/types';
 
-export interface Employee {
-  id: string;
-  name: string;
-  position: string;
-  department: string;
-  avatar: string;
-  hireDate: string;
-  performance: number;
-  personality: number;
-}
-
-export interface EvaluationCriteria {
-  id: string;
-  name: string;
-  category: 'performance' | 'personality';
-  weight: number;
-  description: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'manager' | 'karyawan' | 'pemimpin';
-  avatar: string;
-}
-
-export interface Document {
-  id: string;
-  title: string;
-  employeeId: string;
-  uploadedAt: string;
-  fileUrl: string;
-  status: 'pending' | 'reviewed' | 'approved';
-  comments?: string;
-}
-
-export interface Evaluation {
-  id: string;
-  employeeId: string;
-  managerId: string;
-  date: string;
-  criteriaScores: {
-    criteriaId: string;
-    score: number;
-    comment?: string;
-  }[];
-  overallComment?: string;
-  approved?: boolean;
-  approvedById?: string;
-  approvedDate?: string;
-}
+// User accounts for the login system
+export const users: User[] = [
+  {
+    id: '1',
+    name: 'Admin',
+    email: 'admin@hrmetric.com',
+    password: 'admin123',
+    role: 'admin',
+    avatar: 'https://i.pravatar.cc/150?img=68',
+  },
+  {
+    id: '2',
+    name: 'Manager',
+    email: 'manager@hrmetric.com',
+    password: 'manager123',
+    role: 'manager',
+    avatar: 'https://i.pravatar.cc/150?img=32',
+  },
+  {
+    id: '3',
+    name: 'User',
+    email: 'user@hrmetric.com',
+    password: 'user123',
+    role: 'karyawan',
+    avatar: 'https://i.pravatar.cc/150?img=16',
+  },
+  {
+    id: '4',
+    name: 'Pemimpin',
+    email: 'leader@hrmetric.com',
+    password: 'leader123',
+    role: 'pemimpin',
+    avatar: 'https://i.pravatar.cc/150?img=2',
+  },
+];
 
 export const policies: Policy[] = [
   {
     id: '1',
-    title: 'Promosi Karyawan',
-    category: 'SDM',
-    description: 'Kebijakan promosi karyawan berdasarkan penilaian kinerja dan kepribadian yang selaras dengan nilai perusahaan.',
-    lastUpdated: '2023-10-15',
+    title: 'Kebijakan Cuti',
+    content: `
+      # Kebijakan Cuti Karyawan
+
+      ## Ketentuan Umum
+      1. Setiap karyawan berhak mendapatkan cuti tahunan sebanyak 12 hari kerja.
+      2. Cuti tidak dapat diakumulasikan ke tahun berikutnya.
+      3. Pengajuan cuti harus dilakukan minimal 3 hari kerja sebelumnya.
+
+      ## Prosedur Pengajuan
+      1. Isi formulir pengajuan cuti yang tersedia di sistem HRIS.
+      2. Dapatkan persetujuan dari atasan langsung.
+      3. Serahkan formulir yang telah disetujui ke departemen HR.
+
+      ## Ketentuan Khusus
+      - Cuti pada masa peak season perusahaan akan dibatasi.
+      - Cuti sakit lebih dari 2 hari harus disertai surat keterangan dokter.
+    `,
+    category: 'Cuti & Absensi',
+    createdAt: '2023-07-15',
+    updatedAt: '2023-08-20',
   },
   {
     id: '2',
-    title: 'Pengembangan Karir',
-    category: 'SDM',
-    description: 'Kebijakan pengembangan karir karyawan melalui pelatihan dan pendidikan lanjutan.',
-    lastUpdated: '2023-09-22',
+    title: 'Kebijakan Kompensasi & Benefit',
+    content: `
+      # Kebijakan Kompensasi & Benefit
+
+      ## Struktur Gaji
+      1. Gaji pokok sesuai dengan grade dan jabatan
+      2. Tunjangan transportasi
+      3. Tunjangan makan
+      4. Tunjangan kesehatan
+
+      ## Benefit Karyawan
+      - BPJS Kesehatan dan Ketenagakerjaan
+      - Asuransi kesehatan tambahan
+      - Program dana pensiun
+      - Reimbursement biaya pendidikan dan pelatihan
+
+      ## Review Kompensasi
+      - Dilakukan evaluasi kinerja setiap 6 bulan
+      - Penyesuaian gaji tahunan berdasarkan inflasi dan kinerja
+      - Bonus tahunan berdasarkan performa perusahaan dan individu
+    `,
+    category: 'Kompensasi',
+    createdAt: '2023-05-10',
+    updatedAt: '2023-06-15',
   },
   {
     id: '3',
-    title: 'Penilaian Kinerja',
-    category: 'Manajemen',
-    description: 'Prosedur dan standar penilaian kinerja karyawan secara berkala.',
-    lastUpdated: '2023-11-05',
-  },
-  {
-    id: '4',
-    title: 'Kode Etik',
-    category: 'Umum',
-    description: 'Kode etik dan perilaku karyawan dalam lingkungan kerja dan representasi perusahaan.',
-    lastUpdated: '2023-08-30',
-  },
-  {
-    id: '5',
-    title: 'Target Perusahaan',
-    category: 'Manajemen',
-    description: 'Target strategis perusahaan untuk tahun berjalan dan indikator kesuksesan.',
-    lastUpdated: '2024-01-10',
-  },
-  {
-    id: '6',
-    title: 'Insentif & Bonus',
-    category: 'Keuangan',
-    description: 'Kebijakan pemberian insentif dan bonus berdasarkan pencapaian target individual dan tim.',
-    lastUpdated: '2023-12-12',
+    title: 'Kebijakan Kode Etik Perusahaan',
+    content: `
+      # Kode Etik Perusahaan
+
+      ## Prinsip Dasar
+      1. Integritas dalam setiap tindakan
+      2. Profesionalisme dalam bekerja
+      3. Menghormati keberagaman
+      4. Tanggung jawab sosial dan lingkungan
+
+      ## Etika Kerja
+      - Menjaga kerahasiaan informasi perusahaan
+      - Menghindari konflik kepentingan
+      - Tidak menerima gratifikasi dari pihak ketiga
+      - Menjaga perilaku profesional di tempat kerja
+
+      ## Sanksi Pelanggaran
+      - Peringatan tertulis
+      - Skorsing
+      - Pemutusan hubungan kerja
+      - Tindakan hukum jika diperlukan
+    `,
+    category: 'Etika & Kepatuhan',
+    createdAt: '2023-04-20',
+    updatedAt: '2023-05-05',
   },
 ];
 
@@ -109,71 +123,51 @@ export const employees: Employee[] = [
   {
     id: '1',
     name: 'Budi Santoso',
-    position: 'Manager Pemasaran',
-    department: 'Pemasaran',
-    avatar: 'https://i.pravatar.cc/150?img=1',
+    position: 'Senior Developer',
+    department: 'Engineering',
     hireDate: '2020-05-15',
-    performance: 92,
+    avatar: 'https://i.pravatar.cc/150?img=1',
+    performance: 95,
     personality: 87,
   },
   {
     id: '2',
-    name: 'Siti Rahayu',
-    position: 'Analis Keuangan',
-    department: 'Keuangan',
+    name: 'Dewi Anggraini',
+    position: 'HR Specialist',
+    department: 'Human Resources',
+    hireDate: '2021-03-20',
     avatar: 'https://i.pravatar.cc/150?img=5',
-    hireDate: '2021-02-10',
-    performance: 88,
-    personality: 90,
+    performance: 89,
+    personality: 92,
   },
   {
     id: '3',
-    name: 'Rudi Hartono',
-    position: 'Senior Developer',
-    department: 'Teknologi',
+    name: 'Ahmad Rizal',
+    position: 'Marketing Manager',
+    department: 'Marketing',
+    hireDate: '2019-11-08',
     avatar: 'https://i.pravatar.cc/150?img=12',
-    hireDate: '2022-03-20',
-    performance: 95,
-    personality: 85,
-  },
-  {
-    id: '4',
-    name: 'Maya Putri',
-    position: 'HR Specialist',
-    department: 'SDM',
-    avatar: 'https://i.pravatar.cc/150?img=20',
-    hireDate: '2021-08-15',
-    performance: 87,
-    personality: 93,
-  },
-  {
-    id: '5',
-    name: 'Dian Kusuma',
-    position: 'Content Manager',
-    department: 'Digital Marketing',
-    avatar: 'https://i.pravatar.cc/150?img=25',
-    hireDate: '2022-06-10',
-    performance: 89,
+    performance: 91,
     personality: 88,
   },
   {
-    id: '6',
-    name: 'Eko Prasetyo',
-    position: 'Supply Chain Analyst',
-    department: 'Operasional',
-    avatar: 'https://i.pravatar.cc/150?img=30',
-    hireDate: '2023-01-05',
-    performance: 86,
+    id: '4',
+    name: 'Siti Nurhaliza',
+    position: 'Finance Analyst',
+    department: 'Finance',
+    hireDate: '2022-01-10',
+    avatar: 'https://i.pravatar.cc/150?img=20',
+    performance: 88,
     personality: 85,
   },
   {
-    id: '7',
-    name: 'Linda Wijaya',
-    position: 'Quality Assurance',
-    department: 'Produksi',
-    avatar: 'https://i.pravatar.cc/150?img=35',
-    hireDate: '2022-11-20',
-    performance: 91,
+    id: '5',
+    name: 'Rudi Hermawan',
+    position: 'Product Manager',
+    department: 'Product',
+    hireDate: '2020-08-22',
+    avatar: 'https://i.pravatar.cc/150?img=30',
+    performance: 93,
     personality: 89,
   },
 ];
@@ -181,115 +175,88 @@ export const employees: Employee[] = [
 export const evaluationCriteria: EvaluationCriteria[] = [
   {
     id: '1',
-    name: 'Kedisiplinan',
+    name: 'Kualitas Kerja',
+    description: 'Akurasi, ketelitian, dan kualitas hasil pekerjaan',
     category: 'performance',
     weight: 20,
-    description: 'Ketepatan waktu dan kepatuhan pada aturan',
   },
   {
     id: '2',
-    name: 'Kualitas Kerja',
+    name: 'Produktivitas',
+    description: 'Volume pekerjaan yang diselesaikan dan efisiensi waktu',
     category: 'performance',
-    weight: 30,
-    description: 'Ketelitian dan hasil pekerjaan',
+    weight: 15,
   },
   {
     id: '3',
-    name: 'Kerjasama Tim',
-    category: 'personality',
-    weight: 25,
-    description: 'Kemampuan bekerja dengan rekan',
+    name: 'Pengetahuan Pekerjaan',
+    description: 'Pemahaman tentang prosedur, kebijakan, dan teknik kerja',
+    category: 'performance',
+    weight: 15,
   },
   {
     id: '4',
+    name: 'Keandalan',
+    description: 'Konsistensi, kehadiran, dan tanggung jawab',
+    category: 'performance',
+    weight: 10,
+  },
+  {
+    id: '5',
+    name: 'Komunikasi',
+    description: 'Kemampuan berkomunikasi secara efektif dengan rekan kerja dan atasan',
+    category: 'personality',
+    weight: 10,
+  },
+  {
+    id: '6',
+    name: 'Kerja Tim',
+    description: 'Kemampuan bekerja secara kolaboratif dan berkontribusi dalam tim',
+    category: 'personality',
+    weight: 10,
+  },
+  {
+    id: '7',
     name: 'Inisiatif',
+    description: 'Proaktif mengidentifikasi masalah dan mencari solusi',
     category: 'personality',
-    weight: 25,
-    description: 'Kemampuan mengambil inisiatif dan solusi',
+    weight: 10,
+  },
+  {
+    id: '8',
+    name: 'Adaptabilitas',
+    description: 'Kemampuan beradaptasi dengan perubahan dan mempelajari hal baru',
+    category: 'personality',
+    weight: 10,
   },
 ];
 
-export const users: User[] = [
+// User departments
+export const departments: Department[] = [
   {
     id: '1',
-    name: 'Admin',
-    email: 'admin@hrmetric.com',
-    role: 'admin',
-    avatar: 'https://i.pravatar.cc/150?img=67',
+    name: 'Engineering',
+    description: 'Departemen pengembangan perangkat lunak dan infrastruktur IT',
   },
   {
     id: '2',
-    name: 'Budi Santoso',
-    email: 'budi@hrmetric.com',
-    role: 'manager',
-    avatar: 'https://i.pravatar.cc/150?img=68',
+    name: 'Human Resources',
+    description: 'Departemen pengelolaan sumber daya manusia',
   },
   {
     id: '3',
-    name: 'Siti Rahayu',
-    email: 'siti@hrmetric.com',
-    role: 'karyawan',
-    avatar: 'https://i.pravatar.cc/150?img=47',
+    name: 'Marketing',
+    description: 'Departemen pemasaran dan promosi produk',
   },
   {
     id: '4',
-    name: 'Ahmad Direktur',
-    email: 'ahmad@hrmetric.com',
-    role: 'pemimpin',
-    avatar: 'https://i.pravatar.cc/150?img=60',
-  },
-];
-
-export const documents: Document[] = [
-  {
-    id: '1',
-    title: 'Laporan Kinerja Q1 2023',
-    employeeId: '2',
-    uploadedAt: '2023-04-15',
-    fileUrl: '/documents/report1.pdf',
-    status: 'approved',
-    comments: 'Laporan lengkap dan terperinci',
+    name: 'Finance',
+    description: 'Departemen keuangan dan akuntansi',
   },
   {
-    id: '2',
-    title: 'Evaluasi Proyek Marketing',
-    employeeId: '1',
-    uploadedAt: '2023-06-22',
-    fileUrl: '/documents/eval1.pdf',
-    status: 'pending',
-  },
-];
-
-export const evaluations: Evaluation[] = [
-  {
-    id: '1',
-    employeeId: '2',
-    managerId: '2',
-    date: '2023-12-15',
-    criteriaScores: [
-      { criteriaId: '1', score: 85 },
-      { criteriaId: '2', score: 90 },
-      { criteriaId: '3', score: 88 },
-      { criteriaId: '4', score: 92 },
-    ],
-    overallComment: 'Kinerja sangat baik, perlu peningkatan kedisiplinan',
-    approved: false,
-  },
-  {
-    id: '2',
-    employeeId: '1',
-    managerId: '2',
-    date: '2023-11-20',
-    criteriaScores: [
-      { criteriaId: '1', score: 95 },
-      { criteriaId: '2', score: 88 },
-      { criteriaId: '3', score: 90 },
-      { criteriaId: '4', score: 85 },
-    ],
-    overallComment: 'Kemampuan kepemimpinan yang baik',
-    approved: true,
-    approvedById: '4',
-    approvedDate: '2023-11-25',
+    id: '5',
+    name: 'Product',
+    description: 'Departemen pengembangan dan manajemen produk',
   },
 ];
 
@@ -298,106 +265,36 @@ export const getPromotionScore = (employee: Employee): number => {
   return (employee.performance * 0.6) + (employee.personality * 0.4);
 };
 
-export const getPromotionCandidates = (): Employee[] => {
-  return [...employees]
-    .sort((a, b) => getPromotionScore(b) - getPromotionScore(a))
-    .slice(0, 3);
-};
+// Employee CRUD operations
+let employeesData = [...employees];
 
 export const getEmployeeById = (id: string): Employee | undefined => {
-  return employees.find(employee => employee.id === id);
+  return employeesData.find(emp => emp.id === id);
 };
 
-export const getPolicyById = (id: string): Policy | undefined => {
-  return policies.find(policy => policy.id === id);
-};
-
-export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>): EvaluationCriteria => {
-  const newCriteria: EvaluationCriteria = {
-    ...criteria,
-    id: (evaluationCriteria.length + 1).toString(),
+export const addEmployee = (newEmployeeData: Omit<Employee, 'id'>): Employee => {
+  const newId = (employeesData.length + 1).toString();
+  const newEmployee = {
+    id: newId,
+    ...newEmployeeData,
   };
-  evaluationCriteria.push(newCriteria);
-  return newCriteria;
-};
-
-export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
-  const newEmployee: Employee = {
-    ...employee,
-    id: (employees.length + 1).toString(),
-  };
-  employees.push(newEmployee);
+  employeesData.push(newEmployee);
   return newEmployee;
 };
 
-export const updateEmployee = (id: string, updates: Partial<Employee>): Employee | undefined => {
-  const employeeIndex = employees.findIndex(emp => emp.id === id);
-  if (employeeIndex >= 0) {
-    employees[employeeIndex] = { ...employees[employeeIndex], ...updates };
-    return employees[employeeIndex];
-  }
-  return undefined;
+export const updateEmployee = (id: string, updatedData: Partial<Employee>): Employee | null => {
+  const index = employeesData.findIndex(emp => emp.id === id);
+  if (index === -1) return null;
+  
+  employeesData[index] = {
+    ...employeesData[index],
+    ...updatedData
+  };
+  return employeesData[index];
 };
 
 export const deleteEmployee = (id: string): boolean => {
-  const employeeIndex = employees.findIndex(emp => emp.id === id);
-  if (employeeIndex >= 0) {
-    employees.splice(employeeIndex, 1);
-    return true;
-  }
-  return false;
-};
-
-export const getUserByEmailAndPassword = (email: string, password: string): User | undefined => {
-  return users.find(user => user.email === email);
-};
-
-export const getCurrentUser = (): User | null => {
-  const storedUser = localStorage.getItem('currentUser');
-  return storedUser ? JSON.parse(storedUser) : null;
-};
-
-export const setCurrentUser = (user: User | null): void => {
-  if (user) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-  } else {
-    localStorage.removeItem('currentUser');
-  }
-};
-
-export const getEvaluationsByEmployeeId = (employeeId: string): Evaluation[] => {
-  return evaluations.filter(evaluation => evaluation.employeeId === employeeId);
-};
-
-export const getEvaluationsPendingApproval = (): Evaluation[] => {
-  return evaluations.filter(evaluation => !evaluation.approved);
-};
-
-export const approveEvaluation = (evaluationId: string, approverId: string): void => {
-  const evaluation = evaluations.find(evaluation => evaluation.id === evaluationId);
-  if (evaluation) {
-    evaluation.approved = true;
-    evaluation.approvedById = approverId;
-    evaluation.approvedDate = new Date().toISOString().split('T')[0];
-  }
-};
-
-export const addDocument = (doc: Omit<Document, 'id' | 'status' | 'uploadedAt'>): Document => {
-  const newDoc: Document = {
-    ...doc,
-    id: (documents.length + 1).toString(),
-    status: 'pending',
-    uploadedAt: new Date().toISOString().split('T')[0],
-  };
-  documents.push(newDoc);
-  return newDoc;
-};
-
-export const updateDocument = (id: string, updates: Partial<Document>): Document | undefined => {
-  const docIndex = documents.findIndex(doc => doc.id === id);
-  if (docIndex >= 0) {
-    documents[docIndex] = { ...documents[docIndex], ...updates };
-    return documents[docIndex];
-  }
-  return undefined;
+  const initialLength = employeesData.length;
+  employeesData = employeesData.filter(emp => emp.id !== id);
+  return employeesData.length < initialLength;
 };

@@ -257,82 +257,81 @@ const ManageEmployees = () => {
                   Tambah Karyawan
                 </Button>
               </DialogTrigger>
-            <DialogContent>
-              <form onSubmit={handleSubmit}>
-                <DialogHeader>
-                  <DialogTitle>Tambah Karyawan Baru</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nama Lengkap</Label>
-                    <Input
-                      id="name"
-                      value={newEmployee.name}
-                      onChange={handleInputChange}
-                      placeholder="Masukkan nama lengkap"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="position">Posisi / Jabatan</Label>
-                    <Input
-                      id="position"
-                      value={newEmployee.position}
-                      onChange={handleInputChange}
-                      placeholder="Masukkan posisi"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-4">
+              <DialogContent>
+                <form onSubmit={handleSubmit}>
+                  <DialogHeader>
+                    <DialogTitle>Tambah Karyawan Baru</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="department">Departemen</Label>
-                      <Select value={newEmployee.department} onValueChange={handleSelectChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih departemen" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">+ Tambah Departemen Baru</SelectItem>
-                          {departments.map((department) => (
-                            <SelectItem key={department} value={department}>
-                              {department}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="name">Nama Lengkap</Label>
+                      <Input
+                        id="name"
+                        value={newEmployee.name}
+                        onChange={handleInputChange}
+                        placeholder="Masukkan nama lengkap"
+                        required
+                      />
                     </div>
                     
-                    {newEmployee.department === 'new' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="position">Posisi / Jabatan</Label>
+                      <Input
+                        id="position"
+                        value={newEmployee.position}
+                        onChange={handleInputChange}
+                        placeholder="Masukkan posisi"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="newDepartment">Nama Departemen Baru</Label>
-                        <Input
-                          id="newDepartment"
-                          placeholder="Masukkan nama departemen"
-                          value={newDepartmentName}
-                          onChange={(e) => {
-                            setNewDepartmentName(e.target.value);
-                            if (e.target.value.trim()) {
-                              setNewEmployee(prev => ({ ...prev, department: e.target.value.trim() }));
-                            }
-                          }}
-                          required
-                        />
+                        <Label htmlFor="department">Departemen</Label>
+                        <Select value={newEmployee.department} onValueChange={handleSelectChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih departemen" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">+ Tambah Departemen Baru</SelectItem>
+                            {departments.map((department) => (
+                              <SelectItem key={department} value={department}>
+                                {department}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    )}
+                      
+                      {newEmployee.department === 'new' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="newDepartment">Nama Departemen Baru</Label>
+                          <Input
+                            id="newDepartment"
+                            placeholder="Masukkan nama departemen"
+                            value={newDepartmentName}
+                            onChange={(e) => {
+                              setNewDepartmentName(e.target.value);
+                              if (e.target.value.trim()) {
+                                setNewEmployee(prev => ({ ...prev, department: e.target.value.trim() }));
+                              }
+                            }}
+                            required
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  
-
-                </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Batal
-                  </Button>
-                  <Button type="submit">Tambah Karyawan</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Batal
+                    </Button>
+                    <Button type="submit">Tambah Karyawan</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </motion.div>
         
         <div className="mb-8 space-y-6">
