@@ -1,7 +1,8 @@
 
 import { motion } from 'framer-motion';
 import { Calendar, Star, User, Edit, Trash, Eye, Award } from 'lucide-react';
-import { Employee, getPromotionScore } from '@/lib/data';
+import { getPromotionScore } from '@/lib/data';
+import { Employee } from '@/types';
 import { 
   Card, 
   CardContent, 

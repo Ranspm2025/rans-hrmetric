@@ -73,6 +73,9 @@ export interface Document {
   uploadedBy: string;
   category: string;
   status: 'pending' | 'approved' | 'rejected';
+  employeeId?: string;
+  fileUrl?: string;
+  uploadedAt?: string;
 }
 
 export interface PerformanceData {

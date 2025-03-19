@@ -1,3 +1,4 @@
+
 import type { User, Employee, EvaluationCriteria, Department, Policy, Evaluation, Document, PerformanceData } from '@/types';
 
 // User accounts for the login system
@@ -317,6 +318,7 @@ export const documents: Document[] = [
     fileType: 'application/pdf',
     uploadDate: '2023-04-10',
     uploadedBy: '1',
+    employeeId: '1',
     category: 'Laporan',
     status: 'approved'
   },
@@ -328,6 +330,7 @@ export const documents: Document[] = [
     fileType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     uploadDate: '2023-06-15',
     uploadedBy: '3',
+    employeeId: '3',
     category: 'Pelatihan',
     status: 'pending'
   },
@@ -339,6 +342,7 @@ export const documents: Document[] = [
     fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     uploadDate: '2023-07-22',
     uploadedBy: '2',
+    employeeId: '2',
     category: 'SOP',
     status: 'approved'
   }
@@ -415,11 +419,11 @@ export const getUserByEmailAndPassword = (email: string, password: string): User
 
 // Evaluation functions
 export const getEvaluationsPendingApproval = (): Evaluation[] => {
-  return evaluations.filter(eval => eval.status === 'pending');
+  return evaluations.filter(evaluation => evaluation.status === 'pending');
 };
 
 export const approveEvaluation = (evaluationId: string, approverId: string): Evaluation | null => {
-  const index = evaluations.findIndex(eval => eval.id === evaluationId);
+  const index = evaluations.findIndex(evaluation => evaluation.id === evaluationId);
   if (index === -1) return null;
   
   evaluations[index] = {
@@ -445,11 +449,20 @@ export const addEvaluationCriteria = (criteria: Omit<EvaluationCriteria, 'id'>):
 };
 
 // Document management
-export const addDocument = (document: Omit<Document, 'id'>): Document => {
+export const addDocument = (document: Partial<Document>): Document => {
   const newId = (documents.length + 1).toString();
   const newDocument: Document = {
     id: newId,
-    ...document
+    title: document.title || '',
+    description: document.description || '',
+    fileName: document.fileName || '',
+    fileType: document.fileType || '',
+    uploadDate: new Date().toISOString().split('T')[0],
+    uploadedBy: document.uploadedBy || '',
+    employeeId: document.employeeId || '',
+    category: document.category || '',
+    status: 'pending',
+    fileUrl: document.fileUrl
   };
   
   documents.push(newDocument);

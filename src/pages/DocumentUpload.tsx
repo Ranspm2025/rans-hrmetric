@@ -47,7 +47,12 @@ const DocumentUpload = () => {
         // Here we just add a record to our mock data
         addDocument({
           title,
+          description: `Uploaded by ${user.name}`,
+          fileName: file.name,
+          fileType: file.type,
+          uploadedBy: user.id,
           employeeId: user.id,
+          category: 'User Upload',
           fileUrl: URL.createObjectURL(file), // In a real app, this would be the URL returned by the server
         });
 

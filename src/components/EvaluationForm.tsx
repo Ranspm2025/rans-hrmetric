@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, CheckCircle, HelpCircle } from 'lucide-react';
-import { Employee, evaluationCriteria, getEmployeeById } from '@/lib/data';
+import { evaluationCriteria, getEmployeeById } from '@/lib/data';
+import { Employee } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
