@@ -72,10 +72,11 @@ export interface Document {
   uploadDate: string;
   uploadedBy: string;
   category: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'reviewed';
   employeeId: string; // Changed from optional to required
   fileUrl?: string;
   uploadedAt?: string;
+  comments?: string; // Added missing comments field
 }
 
 export interface PerformanceData {

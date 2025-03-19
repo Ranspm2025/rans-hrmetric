@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { FileText, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -75,7 +76,8 @@ const DocumentCard = ({ doc, index, isManager, isAdmin, isPemimpin }: DocumentCa
               {getStatusIcon(doc.status)}
               <span className="text-xs text-muted-foreground">
                 {doc.status === 'pending' ? 'Menunggu review' : 
-                 doc.status === 'reviewed' ? 'Sudah direview' : 'Disetujui'}
+                 doc.status === 'reviewed' ? 'Sudah direview' : 
+                 doc.status === 'approved' ? 'Disetujui' : 'Ditolak'}
               </span>
             </div>
             <div className="flex gap-2">
