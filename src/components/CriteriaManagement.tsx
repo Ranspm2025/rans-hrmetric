@@ -1,8 +1,9 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { evaluationCriteria, addEvaluationCriteria } from '@/lib/data';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -14,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const CriteriaManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedCriteria, setSelectedCriteria] = useState<string | null>(null);
   const [criteriaName, setCriteriaName] = useState('');
   const [criteriaDescription, setCriteriaDescription] = useState('');
   const [criteriaCategory, setCriteriaCategory] = useState<'performance' | 'personality'>('performance');
@@ -32,7 +35,8 @@ const CriteriaManagement = () => {
     
     // Validate weights
     const currentCategoryItems = evaluationCriteria.filter(c => c.category === criteriaCategory);
-    const currentTotalWeight = currentCategoryItems.reduce((sum, item) => sum + item.weight, 0);
+    const currentTotalWeight = currentCategoryItems.reduce((sum, item) => 
+      selectedCriteria && item.id === selectedCriteria ? sum : sum + item.weight, 0);
     
     if (currentTotalWeight + criteriaWeight > 100) {
       toast({
@@ -43,20 +47,47 @@ const CriteriaManagement = () => {
       return;
     }
     
-    // Add the criteria
-    addEvaluationCriteria({
-      name: criteriaName,
-      description: criteriaDescription,
-      category: criteriaCategory,
-      weight: criteriaWeight,
-    });
-    
-    toast({
-      title: "Kriteria Berhasil Ditambahkan",
-      description: `${criteriaName} telah ditambahkan sebagai kriteria baru`,
-    });
+    if (isEditMode && selectedCriteria) {
+      // Update existing criteria
+      const updatedCriteria = evaluationCriteria.map(c => {
+        if (c.id === selectedCriteria) {
+          return {
+            ...c,
+            name: criteriaName,
+            description: criteriaDescription,
+            category: criteriaCategory,
+            weight: criteriaWeight,
+          };
+        }
+        return c;
+      });
+      
+      // Update the criteria array
+      evaluationCriteria.length = 0;
+      evaluationCriteria.push(...updatedCriteria);
+      
+      toast({
+        title: "Kriteria Berhasil Diperbarui",
+        description: `${criteriaName} telah diperbarui`,
+      });
+    } else {
+      // Add new criteria
+      addEvaluationCriteria({
+        name: criteriaName,
+        description: criteriaDescription,
+        category: criteriaCategory,
+        weight: criteriaWeight,
+      });
+      
+      toast({
+        title: "Kriteria Berhasil Ditambahkan",
+        description: `${criteriaName} telah ditambahkan sebagai kriteria baru`,
+      });
+    }
     
     setIsDialogOpen(false);
+    setIsEditMode(false);
+    setSelectedCriteria(null);
     resetForm();
   };
 
@@ -173,12 +204,55 @@ const CriteriaManagement = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{criteria.weight}%</span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => {
+                          setIsEditMode(true);
+                          setSelectedCriteria(criteria.id);
+                          setCriteriaName(criteria.name);
+                          setCriteriaDescription(criteria.description);
+                          setCriteriaCategory(criteria.category);
+                          setCriteriaWeight(criteria.weight);
+                          setIsDialogOpen(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Hapus Kriteria</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Apakah Anda yakin ingin menghapus kriteria ini? Tindakan ini tidak dapat dibatalkan.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                const index = evaluationCriteria.findIndex(c => c.id === criteria.id);
+                                if (index !== -1) {
+                                  evaluationCriteria.splice(index, 1);
+                                  toast({
+                                    title: "Kriteria Dihapus",
+                                    description: `${criteria.name} telah dihapus dari daftar kriteria`,
+                                  });
+                                }
+                              }}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Hapus
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
               ))}
@@ -208,12 +282,55 @@ const CriteriaManagement = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{criteria.weight}%</span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => {
+                          setIsEditMode(true);
+                          setSelectedCriteria(criteria.id);
+                          setCriteriaName(criteria.name);
+                          setCriteriaDescription(criteria.description);
+                          setCriteriaCategory(criteria.category);
+                          setCriteriaWeight(criteria.weight);
+                          setIsDialogOpen(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Hapus Kriteria</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Apakah Anda yakin ingin menghapus kriteria ini? Tindakan ini tidak dapat dibatalkan.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                const index = evaluationCriteria.findIndex(c => c.id === criteria.id);
+                                if (index !== -1) {
+                                  evaluationCriteria.splice(index, 1);
+                                  toast({
+                                    title: "Kriteria Dihapus",
+                                    description: `${criteria.name} telah dihapus dari daftar kriteria`,
+                                  });
+                                }
+                              }}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Hapus
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
               ))}

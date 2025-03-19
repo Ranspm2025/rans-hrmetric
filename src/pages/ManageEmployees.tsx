@@ -133,23 +133,119 @@ const ManageEmployees = () => {
     });
   };
 
+  const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editedEmployee, setEditedEmployee] = useState({
+    name: '',
+    position: '',
+    department: '',
+  });
+
   const handleEditEmployee = (id: string) => {
-    toast({
-      title: "Edit Karyawan",
-      description: "Fitur edit karyawan akan segera tersedia",
-    });
+    const employee = getEmployeeById(id);
+    if (employee) {
+      setEmployeeToEdit(employee);
+      setEditedEmployee({
+        name: employee.name,
+        position: employee.position,
+        department: employee.department,
+      });
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (employeeToEdit) {
+      const updatedEmployee = updateEmployee(employeeToEdit.id, editedEmployee);
+      if (updatedEmployee) {
+        toast({
+          title: "Karyawan Berhasil Diperbarui",
+          description: `Data ${updatedEmployee.name} telah diperbarui`,
+        });
+        setIsEditDialogOpen(false);
+        setEmployeeToEdit(null);
+      }
+    }
   };
 
   const handleDeleteEmployee = (id: string) => {
-    toast({
-      title: "Hapus Karyawan",
-      description: "Fitur hapus karyawan akan segera tersedia",
-    });
+    const employee = getEmployeeById(id);
+    if (employee) {
+      if (deleteEmployee(id)) {
+        toast({
+          title: "Karyawan Berhasil Dihapus",
+          description: `${employee.name} telah dihapus dari sistem`,
+        });
+      } else {
+        toast({
+          title: "Gagal Menghapus Karyawan",
+          description: "Terjadi kesalahan saat menghapus karyawan",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
+      {/* Edit Employee Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <form onSubmit={handleEditSubmit}>
+            <DialogHeader>
+              <DialogTitle>Edit Karyawan</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nama Lengkap</Label>
+                <Input
+                  id="name"
+                  value={editedEmployee.name}
+                  onChange={(e) => setEditedEmployee(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Masukkan nama lengkap"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="position">Posisi / Jabatan</Label>
+                <Input
+                  id="position"
+                  value={editedEmployee.position}
+                  onChange={(e) => setEditedEmployee(prev => ({ ...prev, position: e.target.value }))}
+                  placeholder="Masukkan posisi"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="department">Departemen</Label>
+                <Select value={editedEmployee.department} onValueChange={(value) => setEditedEmployee(prev => ({ ...prev, department: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih departemen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((department) => (
+                      <SelectItem key={department} value={department}>
+                        {department}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button type="submit">Simpan Perubahan</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       
       <div className="container mx-auto px-4 pt-32 pb-20">
         <motion.div
@@ -165,13 +261,76 @@ const ManageEmployees = () => {
             </p>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <UserPlus className="h-4 w-4 mr-1" />
-                Tambah Karyawan
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Building className="h-4 w-4 mr-1" />
+                  Kelola Departemen
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Kelola Departemen</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="flex gap-2">
+                    <Input
+                      value={newDepartmentName}
+                      onChange={(e) => setNewDepartmentName(e.target.value)}
+                      placeholder="Nama departemen baru"
+                    />
+                    <Button onClick={() => handleAddNewDepartment(newDepartmentName)}>
+                      <Plus className="h-4 w-4 mr-1" />
+                      Tambah
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Daftar Departemen</Label>
+                    <div className="space-y-2">
+                      {departments.map((dept) => (
+                        <div key={dept} className="flex items-center justify-between p-2 border rounded-md">
+                          <span>{dept}</span>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                                <Trash className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Hapus Departemen</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Apakah Anda yakin ingin menghapus departemen {dept}? Pastikan tidak ada karyawan yang masih terdaftar di departemen ini.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Batal</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteDepartment(dept)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Hapus
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserPlus className="h-4 w-4 mr-1" />
+                  Tambah Karyawan
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <form onSubmit={handleSubmit}>
                 <DialogHeader>
@@ -370,9 +529,30 @@ const ManageEmployees = () => {
                         <Button variant="outline" size="sm" onClick={() => handleEditEmployee(employee.id)}>
                           <PenLine className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteEmployee(employee.id)}>
-                          <Trash className="h-4 w-4" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-destructive">
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Hapus Karyawan</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Apakah Anda yakin ingin menghapus karyawan ini? Tindakan ini tidak dapat dibatalkan.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteEmployee(employee.id)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Hapus
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>

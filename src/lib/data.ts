@@ -330,6 +330,24 @@ export const addEmployee = (employee: Omit<Employee, 'id'>): Employee => {
   return newEmployee;
 };
 
+export const updateEmployee = (id: string, updates: Partial<Employee>): Employee | undefined => {
+  const employeeIndex = employees.findIndex(emp => emp.id === id);
+  if (employeeIndex >= 0) {
+    employees[employeeIndex] = { ...employees[employeeIndex], ...updates };
+    return employees[employeeIndex];
+  }
+  return undefined;
+};
+
+export const deleteEmployee = (id: string): boolean => {
+  const employeeIndex = employees.findIndex(emp => emp.id === id);
+  if (employeeIndex >= 0) {
+    employees.splice(employeeIndex, 1);
+    return true;
+  }
+  return false;
+};
+
 export const getUserByEmailAndPassword = (email: string, password: string): User | undefined => {
   return users.find(user => user.email === email);
 };
