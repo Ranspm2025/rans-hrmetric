@@ -14,12 +14,8 @@ export const useNavLinks = () => {
       // All authenticated users can see Employees link
       links.push({ path: '/employees', label: 'Karyawan' });
       
-      if (isKaryawan) {
-        links.push({ path: '/documents', label: 'Dokumen Saya' });
-        links.push({ path: '/upload-document', label: 'Upload Dokumen' });
-      } else {
-        links.push({ path: '/documents', label: 'Dokumen' });
-      }
+      // All users can access documents page
+      links.push({ path: '/documents', label: 'Dokumen' });
       
       if (isAdmin) {
         links.push({ path: '/criteria', label: 'Kriteria' });
