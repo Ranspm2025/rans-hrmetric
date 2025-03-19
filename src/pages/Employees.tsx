@@ -86,11 +86,6 @@ const Employees = () => {
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
     return matchesSearch && matchesDepartment;
-
-    const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          employee.position.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
-    return matchesSearch && matchesDepartment;
   });
 
   const sortedEmployees = [...filteredEmployees].sort((a, b) => {
@@ -179,24 +174,6 @@ const Employees = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-20">
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }}
-          className="space-y-8"
-        >
-              <h2 className="text-xl font-medium">Mengalihkan ke halaman profil...</h2>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 pt-24 pb-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -221,6 +198,60 @@ const Employees = () => {
             />
           )}
         </motion.div>
+        
+        <EmployeeFilters 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          departmentFilter={departmentFilter}
+          onDepartmentFilterChange={setDepartmentFilter}
+          sortField={sortField}
+          onSortFieldChange={(value) => setSortField(value as SortField)}
+          sortOrder={sortOrder}
+          onSortOrderToggle={toggleSortOrder}
+          onResetFilters={resetFilters}
+          departments={departments}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
+        />
+        
+        {sortedEmployees.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center py-12 bg-card rounded-lg shadow p-8"
+          >
+            <p className="text-muted-foreground">Tidak ada karyawan yang ditemukan.</p>
+            <button onClick={resetFilters} className="mt-2 text-primary hover:underline">
+              Reset filter
+            </button>
+          </motion.div>
+        ) : viewMode === 'card' ? (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {sortedEmployees.map((employee, index) => (
+              <EmployeeCard 
+                key={employee.id} 
+                employee={employee} 
+                index={index} 
+                onEvaluate={handleEvaluateEmployee}
+                onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <EmployeeList 
+            employees={sortedEmployees} 
+            onEvaluate={handleEvaluateEmployee}
+            onPromote={isPemimpin ? undefined : handlePromoteEmployee}
+          />
+        )}
+      </div>
+    </div>
         
         <EmployeeFilters 
           searchTerm={searchTerm}
