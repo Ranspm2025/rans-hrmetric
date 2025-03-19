@@ -93,10 +93,10 @@ const Login = () => {
               <AlertDescription>
                 <p className="text-sm font-medium mb-2">Demo Akun:</p>
                 <ul className="text-xs space-y-1 text-muted-foreground">
-                  <li><strong>Admin:</strong> admin@hrmetric.com (password apa saja)</li>
-                  <li><strong>Manager:</strong> budi@hrmetric.com (password apa saja)</li>
-                  <li><strong>Karyawan:</strong> siti@hrmetric.com (password apa saja)</li>
-                  <li><strong>Pimpinan:</strong> ahmad@hrmetric.com (password apa saja)</li>
+                  <li><strong>Admin:</strong> admin@hrmetric.com (password: admin123)</li>
+                  <li><strong>Manager:</strong> budi@hrmetric.com (password: password)</li>
+                  <li><strong>Karyawan:</strong> siti@hrmetric.com (password: password)</li>
+                  <li><strong>Pimpinan:</strong> ahmad@hrmetric.com (password: password)</li>
                 </ul>
               </AlertDescription>
             </Alert>
