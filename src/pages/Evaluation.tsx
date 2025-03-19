@@ -38,14 +38,6 @@ const Evaluation = () => {
         >
           <div>
             <div className="flex items-center gap-2 mb-2">
-              {selectedEmployee ? (
-                <Button variant="ghost" size="sm" asChild className="pl-0 -ml-3">
-                  <Link to="/evaluation">
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Kembali
-                  </Link>
-                </Button>
-              ) : null}
               <h1 className="text-3xl font-bold">
                 {selectedEmployee
                   ? 'Penilaian Karyawan'
