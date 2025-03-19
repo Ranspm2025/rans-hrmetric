@@ -73,30 +73,19 @@ const Employees = () => {
       }
     }
 
-    // If regular user, show only their profile
+    // Regular employees can view all employee evaluations
     if (isKaryawan && !isAdmin && !isManager && !isPemimpin && user) {
-      const userEmployee = employees.find(
-        emp => emp.name.toLowerCase() === user.name.toLowerCase()
-      );
-      
-      if (userEmployee) {
-        navigate(`/evaluation?employeeId=${userEmployee.id}`);
-      } else {
-        toast({
-          title: "Profil tidak ditemukan",
-          description: "Profil karyawan Anda tidak ditemukan dalam sistem",
-          variant: "destructive"
-        });
-        navigate('/');
-      }
+      // No redirection, allow viewing all employees
+      return;
     }
   }, [isKaryawan, isAdmin, isManager, isPemimpin, user, navigate, searchParams, toast]);
 
   const filteredEmployees = employees.filter(employee => {
-    // Regular users should only see their own profile
-    if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-      return user && employee.name.toLowerCase() === user.name.toLowerCase();
-    }
+    // All users can view employee list
+    const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = departmentFilter ? employee.department === departmentFilter : true;
+    return matchesSearch && matchesDepartment;
 
     const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
@@ -186,18 +175,15 @@ const Employees = () => {
     }
   };
 
-  // If user is a basic employee, we'll redirect them in the useEffect
-  if (isKaryawan && !isAdmin && !isManager && !isPemimpin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-        <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-20">
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center h-64"
-          >
-            <div className="text-center">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <Navbar />
+      <div className="container mx-auto px-4 pt-24 pb-20">
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }}
+          className="space-y-8"
+        >
               <h2 className="text-xl font-medium">Mengalihkan ke halaman profil...</h2>
             </div>
           </motion.div>
