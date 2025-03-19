@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Search, CheckSquare, User, ClipboardCheck } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
-import { evaluations, getEmployeeById, approveEvaluation, getEvaluationsPendingApproval } from '@/lib/data';
+import { getEvaluations, getEmployeeById, approveEvaluation, getEvaluationsPendingApproval } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +22,7 @@ import {
 
 const ManagerEvaluations = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedEvaluation, setSelectedEvaluation] = useState<typeof evaluations[0] | null>(null);
+  const [selectedEvaluation, setSelectedEvaluation] = useState<ReturnType<typeof getEvaluations>[0] | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const { isAuthenticated, user, isPemimpin } = useAuth();
   const { toast } = useToast();
@@ -52,7 +52,7 @@ const ManagerEvaluations = () => {
     setIsDetailDialogOpen(false);
   };
 
-  const openDetailDialog = (evaluation: typeof evaluations[0]) => {
+  const openDetailDialog = (evaluation: ReturnType<typeof getEvaluations>[0]) => {
     setSelectedEvaluation(evaluation);
     setIsDetailDialogOpen(true);
   };

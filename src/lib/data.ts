@@ -417,7 +417,7 @@ export const deleteEmployee = (id: string): boolean => {
   employeesData = employeesData.filter(emp => emp.id !== id);
   
   // Also delete any evaluations for this employee
-  evaluationsData = evaluationsData.filter(eval => eval.employeeId !== id);
+  evaluationsData = evaluationsData.filter(evaluation => evaluation.employeeId !== id);
   
   return employeesData.length < initialLength;
 };
@@ -490,11 +490,11 @@ export const getEvaluations = (): Evaluation[] => {
 };
 
 export const getEvaluationById = (id: string): Evaluation | undefined => {
-  return evaluationsData.find(eval => eval.id === id);
+  return evaluationsData.find(evaluation => evaluation.id === id);
 };
 
 export const getEmployeeEvaluations = (employeeId: string): Evaluation[] => {
-  return evaluationsData.filter(eval => eval.employeeId === employeeId);
+  return evaluationsData.filter(evaluation => evaluation.employeeId === employeeId);
 };
 
 export const addEvaluation = (evaluationData: Omit<Evaluation, 'id'>): Evaluation => {
@@ -543,7 +543,7 @@ export const addEvaluation = (evaluationData: Omit<Evaluation, 'id'>): Evaluatio
 };
 
 export const updateEvaluation = (id: string, updatedData: Partial<Evaluation>): Evaluation | null => {
-  const index = evaluationsData.findIndex(eval => eval.id === id);
+  const index = evaluationsData.findIndex(evaluation => evaluation.id === id);
   if (index === -1) return null;
   
   // Keep track of old and new criteria scores for employee update
@@ -598,7 +598,7 @@ export const updateEvaluation = (id: string, updatedData: Partial<Evaluation>): 
 
 export const deleteEvaluation = (id: string): boolean => {
   const initialLength = evaluationsData.length;
-  evaluationsData = evaluationsData.filter(eval => eval.id !== id);
+  evaluationsData = evaluationsData.filter(evaluation => evaluation.id !== id);
   return evaluationsData.length < initialLength;
 };
 
@@ -768,6 +768,11 @@ export const setCurrentUser = (user: User | null): void => {
 export const getUserByEmailAndPassword = (email: string, password: string): User | null => {
   const user = users.find(u => u.email === email && u.password === password);
   return user || null;
+};
+
+// Add function to get policy by id
+export const getPolicyById = (id: string): Policy | undefined => {
+  return policies.find(policy => policy.id === id);
 };
 
 // Expose employees for other files
