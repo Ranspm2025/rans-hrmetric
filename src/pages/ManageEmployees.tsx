@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, Search, Filter, UserPlus, Mail, Phone, Building, User, Trash, PenLine } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
-import { employees, addEmployee } from '@/lib/data';
+import { employees, addEmployee, getEmployeeById, deleteEmployee } from '@/lib/data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +26,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const ManageEmployees = () => {
   const [searchTerm, setSearchTerm] = useState('');

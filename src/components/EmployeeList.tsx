@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, PenLine, Trash, Building, Eye, Award } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { getPromotionScore } from '@/lib/data';
+import { getPromotionScore, getEmployeeById, deleteEmployee } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -76,10 +76,19 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
 
   const handleDeleteEmployee = () => {
     if (employeeToDelete) {
-      toast({
-        title: "Hapus Karyawan",
-        description: "Karyawan berhasil dihapus dari sistem",
-      });
+      const employee = getEmployeeById(employeeToDelete);
+      if (employee && deleteEmployee(employeeToDelete)) {
+        toast({
+          title: "Hapus Karyawan",
+          description: `${employee.name} berhasil dihapus dari sistem`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Gagal menghapus karyawan",
+          variant: "destructive"
+        });
+      }
       setEmployeeToDelete(null);
     }
   };
