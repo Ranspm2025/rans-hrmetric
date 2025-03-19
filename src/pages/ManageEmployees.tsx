@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, Filter, UserPlus, Mail, Phone, Building, User, Trash, PenLine } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
 import { employees, addEmployee } from '@/lib/data';
 import { Input } from '@/components/ui/input';
@@ -42,6 +43,7 @@ const ManageEmployees = () => {
   const { toast } = useToast();
 
   const [departments, setDepartments] = useState([...new Set(employees.map(employee => employee.department))]);
+  const [newDepartmentName, setNewDepartmentName] = useState('');
 
   const handleDeleteDepartment = (departmentToDelete: string) => {
     const employeesInDepartment = employees.filter(emp => emp.department === departmentToDelete);
@@ -277,6 +279,22 @@ const ManageEmployees = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <div className="flex gap-2 mb-4">
+                  <Input
+                    placeholder="Nama departemen baru"
+                    value={newDepartmentName}
+                    onChange={(e) => setNewDepartmentName(e.target.value)}
+                  />
+                  <Button onClick={() => {
+                    if (newDepartmentName.trim()) {
+                      handleAddNewDepartment(newDepartmentName.trim());
+                      setNewDepartmentName('');
+                    }
+                  }}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Tambah
+                  </Button>
+                </div>
                 {departments.map((department) => (
                   <div key={department} className="flex items-center justify-between p-2 rounded-lg border">
                     <div className="flex items-center gap-2">

@@ -21,16 +21,17 @@ export const useNavLinks = () => {
         links.push({ path: '/documents', label: 'Dokumen' });
       }
       
-      if (isManager || isAdmin) {
+      if (isAdmin) {
+        links.push({ path: '/criteria', label: 'Kriteria' });
         links.push({ path: '/evaluation', label: 'Penilaian' });
+      } else if (isManager) {
+        links.push({ path: '/evaluation', label: 'Penilaian' });
+      } else if (isKaryawan) {
+        links.push({ path: '/evaluation', label: 'Evaluasi' });
       }
       
       if (isPemimpin) {
         links.push({ path: '/manager-evaluations', label: 'Evaluasi Manager' });
-      }
-      
-      if (isManager || isAdmin) {
-        links.push({ path: '/criteria', label: 'Kriteria' });
       }
     }
     

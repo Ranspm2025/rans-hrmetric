@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, PenLine, Trash, Building, Eye, Award } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -44,12 +44,16 @@ interface EmployeeListProps {
 }
 
 const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) => {
-  const { isAdmin, isManager, isPemimpin } = useAuth();
+  const { isAdmin, isManager, isPemimpin, isKaryawan } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
   const handleEvaluate = (id: string) => {
-    if (onEvaluate) {
+    if (isKaryawan) {
+      // For regular employees, directly navigate to view evaluation
+      navigate(`/evaluation?employeeId=${id}&view=true`);
+    } else if (onEvaluate) {
       onEvaluate(id);
     }
   };
