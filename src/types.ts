@@ -73,7 +73,7 @@ export interface Document {
   uploadedBy: string;
   category: string;
   status: 'pending' | 'approved' | 'rejected';
-  employeeId?: string;
+  employeeId: string; // Changed from optional to required
   fileUrl?: string;
   uploadedAt?: string;
 }

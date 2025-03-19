@@ -459,10 +459,11 @@ export const addDocument = (document: Partial<Document>): Document => {
     fileType: document.fileType || '',
     uploadDate: new Date().toISOString().split('T')[0],
     uploadedBy: document.uploadedBy || '',
-    employeeId: document.employeeId || '',
+    employeeId: document.employeeId || '', // Must be provided
     category: document.category || '',
     status: 'pending',
-    fileUrl: document.fileUrl
+    fileUrl: document.fileUrl || '',
+    uploadedAt: new Date().toISOString()
   };
   
   documents.push(newDocument);

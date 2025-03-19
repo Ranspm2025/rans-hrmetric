@@ -1,20 +1,13 @@
-
 import { motion } from 'framer-motion';
 import { FileText, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { employees } from '@/lib/data';
+import { Document } from '@/types';
 
 interface DocumentCardProps {
-  doc: {
-    id: string;
-    employeeId: string;
-    title: string;
-    uploadedAt: string;
-    status: string;
-    comments?: string;
-  };
+  doc: Document;
   index: number;
   isManager: boolean;
   isAdmin: boolean;
