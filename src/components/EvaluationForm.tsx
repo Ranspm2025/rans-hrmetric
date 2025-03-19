@@ -35,16 +35,17 @@ const EvaluationForm = ({ employeeId }: EvaluationFormProps) => {
   const searchParams = new URLSearchParams(window.location.search);
   const viewOnly = searchParams.get('view') === 'true';
 
-  // Only managers can perform evaluations
-  if (!isManager && !viewOnly) {
-    toast({
-      title: "Akses Ditolak",
-      description: "Hanya manager yang dapat melakukan penilaian.",
-      variant: "destructive"
-    });
-    navigate('/');
-    return;
-  }
+  useEffect(() => {
+    // Only managers can perform evaluations
+    if (!isManager && !viewOnly) {
+      toast({
+        title: "Akses Ditolak",
+        description: "Hanya manager yang dapat melakukan penilaian.",
+        variant: "destructive"
+      });
+      navigate('/');
+    }
+  }, [isManager, viewOnly, toast, navigate]);
 
   // Show evaluation results for non-managers
   if (!isManager || viewOnly) {

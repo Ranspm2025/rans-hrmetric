@@ -50,11 +50,14 @@ const EmployeeList = ({ employees, onEvaluate, onPromote }: EmployeeListProps) =
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
   const handleEvaluate = (id: string) => {
-    if (isKaryawan) {
-      // For regular employees, directly navigate to view evaluation
+    if (isManager) {
+      // Managers can perform evaluations
+      if (onEvaluate) {
+        onEvaluate(id);
+      }
+    } else {
+      // All other roles can only view evaluations
       navigate(`/evaluation?employeeId=${id}&view=true`);
-    } else if (onEvaluate) {
-      onEvaluate(id);
     }
   };
 
